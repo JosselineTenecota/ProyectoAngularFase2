@@ -1,3 +1,13 @@
+:host 
+{
+  display: block;
+  background-color: #121212; 
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #ECECEC;
+  text-align: center; 
+}
+
 .botones
 {
     display: flex;
@@ -10,13 +20,15 @@
 {
   align-items: center;
   appearance: none;
-  background-color: #EEF2FF;
+  background-color: #1E1E1E;
   border-radius: 8px;
   border-width: 2px;
   border-color: #536DFE;
-  box-shadow: rgba(83, 109, 254, 0.2) 0 2px 4px, rgba(83, 109, 254, 0.15) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+  box-shadow: rgba(83, 109, 254, 0.2) 0 2px 4px,
+              rgba(83, 109, 254, 0.15) 0 7px 13px -3px,
+              #000 0 -3px 0 inset;
   box-sizing: border-box;
-  color: #536DFE;
+  color: #90CAF9;
   cursor: pointer;
   display: inline-flex;
   font-family: "JetBrains Mono", monospace;
@@ -49,15 +61,20 @@
 .ui-btn:hover 
 {
   box-shadow: rgba(83, 109, 254, 0.3) 0 4px 8px,
-    rgba(83, 109, 254, 0.2) 0 7px 13px -3px,
-    #D6D6E7 0 -3px 0 inset;
+              rgba(83, 109, 254, 0.2) 0 7px 13px -3px,
+              #000 0 -3px 0 inset;
   transform: translateY(-2px);
 }
 
 .ui-btn:active 
 {
-  box-shadow: #D6D6E7 0 3px 7px inset;
+  box-shadow: #000 0 3px 7px inset;
   transform: translateY(2px);
+}
+
+.ui-btn.ressaltado {
+  border-color: #FFAB40; 
+  color: #FFAB40;
 }
 
 .primario
