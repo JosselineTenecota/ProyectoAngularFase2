@@ -1,17 +1,26 @@
 <nav class="navbar">
-  <div class="logo">Portafolio de <span>Servicios</span></div>
+  <div class="wrapper nav-content">
 
-  <div class="menu">
-    <a routerLink="/portafolios">Portafolios</a>
-    <a routerLink="/agendar">Asesorías</a>
-    <a routerLink="/login" class="login-btn">Iniciar Sesión</a>
+    <div class="logo">Portafolio de <span>Servicios</span></div>
+
+    <!-- Botón hamburguesa para móviles -->
+    <button class="hamburger" (click)="menuOpen = !menuOpen">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Menú normal escritorio -->
+    <div class="menu" [class.open]="menuOpen">
+      <a routerLink="/portafolios">Portafolios</a>
+      <a routerLink="/agendar">Asesorías</a>
+      <a routerLink="/login" class="login-btn">Iniciar Sesión</a>
+    </div>
+
   </div>
 </nav>
 
-<div class="hero">
-  <h1 class="titulo">
-    Portafolio Multi-Usuario
-  </h1>
+
+<div class="hero wrapper">
+  <h1 class="titulo">Portafolio Multi-Usuario</h1>
 
   <p class="subtitulo">
     Gestión profesional de proyectos, perfiles de desarrolladores y creación de asesorías personalizadas.
