@@ -4,6 +4,7 @@ import { adminGuard } from './core/guards/admin-guard';
 import { programadorGuard } from './core/guards/programador-guard';
 
 export const routes: Routes = [
+  // --- RUTAS PÚBLICAS ---
   {
     path: '',
     loadComponent: () =>
@@ -14,20 +15,24 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./auth/login/login').then(m => m.Login),
   },
-  
-  // --- INICIO DE RUTAS PÚBLICAS NUEVAS ---
   {
     path: 'portafolios',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./public/pages/programadores/programadores').then(m => m.Programadores),
   },
   {
-    path: 'portafolio/:id', // El :id es vital para saber qué perfil mostrar
-    loadComponent: () => 
+    path: 'portafolio/:id',
+    loadComponent: () =>
       import('./public/pages/portafolio/portafolio').then(m => m.Portafolio),
   },
-  // --- FIN DE RUTAS PÚBLICAS NUEVAS ---
+  {
+    path: 'agendar',
+    loadComponent: () => 
+      // OJO: Aquí apuntamos al archivo con nombre largo (.component)
+      import('./asesorias/agendar/agendar.component').then(m => m.AgendarComponent),
+  },
 
+  // --- RUTAS PROTEGIDAS ---
   {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
@@ -42,5 +47,7 @@ export const routes: Routes = [
       import('./programador/dashboard/dashboard')
         .then(m => m.Dashboard),
   },
+
+  // --- COMODÍN (SIEMPRE AL FINAL) ---
   { path: '**', redirectTo: '' },
 ];
