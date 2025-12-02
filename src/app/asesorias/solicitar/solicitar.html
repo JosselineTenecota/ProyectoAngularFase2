@@ -1,1 +1,32 @@
-<p>solicitar works!</p>
+<div class="solicitudes-wrapper">
+
+  <h1>Solicitudes Pendientes</h1>
+
+  <!-- Si no hay solicitudes -->
+  <div *ngIf="solicitudes.length === 0" class="no-solicitudes">
+    <p>No tienes solicitudes pendientes.</p>
+  </div>
+
+  <!-- Listado de cards -->
+  <div class="cards-container">
+    <div *ngFor="let s of solicitudes" class="card">
+
+      <div class="card-header">
+        <h2>{{ s.usuarioNombre }}</h2>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Fecha:</strong> {{ s.fecha }}</p>
+        <p><strong>Hora:</strong> {{ s.hora }}</p>
+        <p><strong>Tema:</strong> {{ s.tema }}</p>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn aceptar" (click)="aceptar(s.id)">Aceptar</button>
+        <button class="btn rechazar" (click)="rechazar(s.id)">Rechazar</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

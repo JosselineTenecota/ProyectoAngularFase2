@@ -1,0 +1,91 @@
+/* Contenedor principal */
+.solicitudes-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Mensaje sin solicitudes */
+.no-solicitudes {
+  text-align: center;
+  padding: 20px;
+  background: #222;
+  border-radius: 10px;
+  color: #aaa;
+}
+
+/* Grid de cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Card */
+.card {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* Header del card */
+.card-header h2 {
+  margin: 0 0 10px;
+  color: #4dadff;
+}
+
+/* Cuerpo */
+.card-body p {
+  margin: 5px 0;
+  color: #ddd;
+}
+
+/* Botones */
+.card-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  width: 48%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.aceptar {
+  background: #28a745;
+  color: white;
+}
+
+.aceptar:hover {
+  background: #34d058;
+}
+
+.rechazar {
+  background: #d63c3c;
+  color: white;
+}
+
+.rechazar:hover {
+  background: #ff5757;
+}
