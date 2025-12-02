@@ -1,3 +1,4 @@
+// ... imports (los mismos de antes)
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,38 +16,49 @@ import { Asesoria } from '../../core/models/asesoria.interface';
   styleUrls: ['./agendar.component.scss']
 })
 export class AgendarComponent implements OnInit {
+  // ... inyecciones (igual que antes)
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private router = inject(Router);
 
   programadores: Programador[] = [];
   
-  // --- NUEVO: Lista de horas fijas de 8:00 a 17:00 ---
+  // Lista de horas
   horariosDisponibles: string[] = [
     '08:00', '09:00', '10:00', '11:00', '12:00', 
     '13:00', '14:00', '15:00', '16:00', '17:00'
   ];
 
+  // NUEVO: Variable para bloquear fechas pasadas en el HTML
+  minDate: string = '';
+
   solicitud: any = {
     programadorId: '',
     fecha: '',
-    hora: '', // Aquí se guardará una de las horas de la lista
+    hora: '',
     tema: ''
   };
 
   ngOnInit() {
     this.cargarProgramadores();
+    this.calcularFechaMinima(); // <--- Llamamos a la función al iniciar
   }
 
+  // NUEVO: Calcula la fecha de hoy en formato YYYY-MM-DD
+  calcularFechaMinima() {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    this.minDate = `${yyyy}-${mm}-${dd}`;
+  }
+
+  // ... cargarProgramadores() sigue igual ...
   async cargarProgramadores() {
     const usersRef = collection(this.firestore, 'users');
     const q = query(usersRef, where('role', '==', 'programador'));
     const snapshot = await getDocs(q);
-    
-    this.programadores = snapshot.docs.map(doc => ({
-      uid: doc.id,
-      ...doc.data()
-    } as Programador));
+    this.programadores = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as Programador));
   }
 
   async enviarSolicitud() {
@@ -62,6 +74,18 @@ export class AgendarComponent implements OnInit {
       alert('Por favor completa todos los campos.');
       return;
     }
+
+    // --- NUEVA VALIDACIÓN DE FECHA Y HORA ---
+    // Creamos una fecha combinando lo que eligió el usuario
+    const fechaSeleccionada = new Date(this.solicitud.fecha + 'T' + this.solicitud.hora);
+    const ahora = new Date();
+
+    // Comparamos si la fecha seleccionada ya pasó
+    if (fechaSeleccionada < ahora) {
+      alert("No puedes agendar una cita a un dia u hora anterior.");
+      return; // Detenemos la función aquí
+    }
+    // ----------------------------------------
 
     const progSeleccionado = this.programadores.find(p => p.uid === this.solicitud.programadorId);
 
