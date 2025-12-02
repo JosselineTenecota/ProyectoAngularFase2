@@ -2,18 +2,22 @@
   <div class="left">
     <a routerLink="/">Home</a>
 
-    <a *ngIf="auth.currentRole === 'admin'" routerLink="/admin">Admin</a>
+    <!-- Mostrar solo si el usuario es admin -->
+    <a *ngIf="(user$ | async)?.role === 'admin'" routerLink="/admin">Admin</a>
 
-    <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">Programador</a>
+    <!-- Mostrar solo si el usuario es programador -->
+    <a *ngIf="(user$ | async)?.role === 'programador'" routerLink="/programador">Programador</a>
   </div>
 
   <div class="right">
 
-    <a *ngIf="!auth.isLogged()" routerLink="/login">Iniciar sesión</a>
+    <!-- Si NO hay usuario -->
+    <a *ngIf="!(user$ | async)" routerLink="/login">Iniciar sesión</a>
 
-    <div *ngIf="auth.isLogged()" class="user-info">
-      <img [src]="auth.currentUser?.photo" alt="Foto usuario" />
-      <span>{{ auth.currentUser?.name }}</span>
+    <!-- Si HAY usuario -->
+    <div *ngIf="user$ | async as user" class="user-info">
+      <img [src]="user.photo" alt="Foto usuario" />
+      <span>{{ user.name }}</span>
 
       <button (click)="logout()">Cerrar sesión</button>
     </div>

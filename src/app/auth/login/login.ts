@@ -14,36 +14,48 @@ export class Login {
 
   private authService = inject(AuthService);
   private router = inject(Router);
-
+  
 
   constructor() {
-    const user = this.authService.currentUser;
-
-    if (user) {
-
-      this.router.navigate(['/']);
-    }
+    // Ya hay sesión activa → redirigir automáticamente
+    this.authService.userData$.subscribe(user => {
+      if (user && user.role) {
+        this.redirectByRole(user.role);
+      }
+    });
   }
-
 
   async login() {
-    const result = await this.authService.loginWithGoogle();
+    try {
+      // Realizar login y garantizar que el user se cree o actualice en Firestore
+      await this.authService.loginWithGoogle();
 
-    if (!result) return;
+      // Esperamos a que AuthService emita los datos completos del usuario (incluido role)
+      this.authService.userData$.subscribe(user => {
+        if (!user) return;          // Aún no carga
+        if (!user.role) return;     // Documento sin rol aún
+        
+        this.redirectByRole(user.role);
+      });
 
-    const user = this.authService.currentUser;
-
-    if (user.role === 'admin') {
-      this.router.navigate(['/admin']);
-      return;
+    } catch (error) {
+      console.error("Error en login:", error);
     }
-
-    if (user.role === 'programador') {
-      this.router.navigate(['/programador']);
-      return;
-    }
-
-    this.router.navigate(['/']);
   }
 
+  private redirectByRole(role: string) {
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/admin']);
+        break;
+
+      case 'programador':
+        this.router.navigate(['/programador']);
+        break;
+
+      default:
+        this.router.navigate(['/']);
+        break;
+    }
+  }
 }

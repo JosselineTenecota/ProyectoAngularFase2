@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -11,13 +11,12 @@ import { AuthService } from '../../services/auth';
   styleUrls: ['./navbar.scss']
 })
 export class Navbar {
+
   auth = inject(AuthService);
-  router = inject(Router);
+  user$ = this.auth.userData$;
 
   logout() {
-    this.auth.logout().then(() => {
-      this.router.navigate(['/']);
-    });
+    this.auth.logout();
   }
-}
 
+}
