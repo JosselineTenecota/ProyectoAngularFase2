@@ -1,91 +1,180 @@
-/* Contenedor principal */
-.solicitudes-wrapper {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  color: #fff;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-/* Mensaje sin solicitudes */
-.no-solicitudes {
-  text-align: center;
-  padding: 20px;
-  background: #222;
-  border-radius: 10px;
-  color: #aaa;
-}
-
-/* Grid de cards */
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-/* Card */
-.card {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: scale(1.02);
-}
-
-/* Header del card */
-.card-header h2 {
-  margin: 0 0 10px;
-  color: #4dadff;
-}
-
-/* Cuerpo */
-.card-body p {
-  margin: 5px 0;
-  color: #ddd;
-}
-
-/* Botones */
-.card-actions {
-  margin-top: 15px;
+/* Wrapper general */
+.wrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
 }
 
-.btn {
-  width: 48%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
+/* Contenedor del formulario */
+.form-container {
+  background-color: #1e1e2f;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+
+  h1 {
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #ccc;
+  }
+
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      label {
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: none;
+        background-color: #2c2c3e;
+        color: #fff;
+        font-size: 1rem;
+
+        &:focus {
+          outline: 2px solid #4caf50;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    .btn-submit {
+      padding: 0.8rem 1.5rem;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background-color: #43a047;
+      }
+    }
+  }
 }
 
-.aceptar {
-  background: #28a745;
-  color: white;
-}
+/* Estilos para las solicitudes (cards) */
+.solicitudes-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
 
-.aceptar:hover {
-  background: #34d058;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
 
-.rechazar {
-  background: #d63c3c;
-  color: white;
-}
+  .no-solicitudes {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+  }
 
-.rechazar:hover {
-  background: #ff5757;
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+
+    .card {
+      background-color: #1e1e2f;
+      color: #fff;
+      border-radius: 12px;
+      width: 250px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      .card-header {
+        background-color: #2c2c3e;
+        padding: 0.8rem 1rem;
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-align: center;
+      }
+
+      .card-body {
+        padding: 1rem;
+
+        p {
+          margin: 0.3rem 0;
+          font-size: 0.95rem;
+        }
+      }
+
+      .card-actions {
+        display: flex;
+        justify-content: space-around;
+        padding: 0.8rem 0;
+        background-color: #2c2c3e;
+
+        .btn {
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background 0.3s ease;
+
+          &.aceptar {
+            background-color: #4caf50;
+            color: #fff;
+
+            &:hover {
+              background-color: #43a047;
+            }
+          }
+
+          &.rechazar {
+            background-color: #f44336;
+            color: #fff;
+
+            &:hover {
+              background-color: #d32f2f;
+            }
+          }
+        }
+      }
+    }
+  }
 }
+  

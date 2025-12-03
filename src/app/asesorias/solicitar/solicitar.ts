@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, query, where, getDocs, updateDoc, doc } from '@angular/fire/firestore';
-import { AuthService } from '../../core/services/auth';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AsesoriasService } from '../../core/services/asesorias';
+import { NotificacionesService } from '../../core/services/notificaciones';
+import { AuthService } from '../../core/services/auth';
+import { Asesoria } from '../../core/models/asesoria.interface';
+import { Notificacion } from '../../core/models/notificacion.interface';
 
 @Component({
   selector: 'app-solicitar',
@@ -11,69 +14,47 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./solicitar.scss']
 })
 export class Solicitar implements OnInit {
+  solicitudes: Asesoria[] = [];
 
-  solicitudes: any[] = [];
-
-  constructor(
-    private firestore: Firestore,
-    private auth: AuthService
-  ) {}
+  private asesoriasService = inject(AsesoriasService);
+  private notificacionesService = inject(NotificacionesService);
+  private auth = inject(AuthService);
 
   async ngOnInit() {
     await this.cargarSolicitudes();
   }
 
-  // ------------------------------------------------------
-  // 1. Cargar SOLO las solicitudes del programador logueado
-  // ------------------------------------------------------
   async cargarSolicitudes() {
     const user = await new Promise<any>(resolve => {
       this.auth.userData$.subscribe(u => resolve(u));
     });
-
     if (!user) return;
 
-    console.log("UID del programador logueado:", user.uid);
-
-    const ref = collection(this.firestore, "asesorias");
-
-    const q = query(
-      ref,
-      where("programadorId", "==", user.uid),
-      where("estado", "==", "Pendiente")
-    );
-
-    const snap = await getDocs(q);
-
-    this.solicitudes = snap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
-
-    console.log("Solicitudes encontradas:", this.solicitudes);
+    this.solicitudes = await this.asesoriasService.getSolicitudesPendientes(user.uid);
   }
 
-  // ------------------------------------------------------
-  // 2. Aceptar solicitud
-  // ------------------------------------------------------
-  async aceptar(id: string) {
-    await updateDoc(doc(this.firestore, "asesorias", id), {
-      estado: "Aceptada"
-    });
+  async responder(asesoria: Asesoria, estado: 'Aprobada' | 'Rechazada', respuesta?: string) {
+    if (!asesoria.id) return;
 
-    alert("Solicitud aceptada.");
-    this.cargarSolicitudes();
-  }
+    // 1. Actualizar estado en Firestore
+    await this.asesoriasService.actualizarEstado(asesoria.id, estado, respuesta);
 
-  // ------------------------------------------------------
-  // 3. Rechazar solicitud
-  // ------------------------------------------------------
-  async rechazar(id: string) {
-    await updateDoc(doc(this.firestore, "asesorias", id), {
-      estado: "Rechazada"
-    });
+    // 2. Crear objeto Notificacion completo
+    const notificacion: Notificacion = {
+      userId: asesoria.clienteId,
+      type: estado === 'Aprobada' ? 'aprobacion' : 'rechazo',
+      message: estado === 'Aprobada'
+        ? `Tu solicitud fue aprobada por ${asesoria.programadorNombre}`
+        : `Tu solicitud fue rechazada por ${asesoria.programadorNombre}. ${respuesta || ''}`,
+      relatedAsesoriaId: asesoria.id,
+      createdAt: new Date(),
+      read: false
+    };
 
-    alert("Solicitud rechazada.");
-    this.cargarSolicitudes();
+    // 3. Enviar notificación
+    await this.notificacionesService.enviarNotificacion(notificacion);
+
+    // 4. Refrescar lista
+    await this.cargarSolicitudes();
   }
 }

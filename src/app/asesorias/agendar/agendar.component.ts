@@ -1,12 +1,13 @@
-// ... imports (los mismos de antes)
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Firestore, collection, query, where, getDocs, addDoc } from '@angular/fire/firestore';
+import { Firestore, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Programador } from '../../core/models/programador.interface';
 import { Asesoria } from '../../core/models/asesoria.interface';
+import { AsesoriasService } from '../../core/services/asesorias';
+import { NotificacionesService } from '../../core/services/notificaciones';
 
 @Component({
   selector: 'app-agendar',
@@ -16,20 +17,17 @@ import { Asesoria } from '../../core/models/asesoria.interface';
   styleUrls: ['./agendar.component.scss']
 })
 export class AgendarComponent implements OnInit {
-  // ... inyecciones (igual que antes)
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private router = inject(Router);
+  private asesoriasService = inject(AsesoriasService);
+  private notificacionesService = inject(NotificacionesService);
 
   programadores: Programador[] = [];
-  
-  // Lista de horas
   horariosDisponibles: string[] = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00'
+    '08:00','09:00','10:00','11:00','12:00',
+    '13:00','14:00','15:00','16:00','17:00'
   ];
-
-  // NUEVO: Variable para bloquear fechas pasadas en el HTML
   minDate: string = '';
 
   solicitud: any = {
@@ -41,10 +39,9 @@ export class AgendarComponent implements OnInit {
 
   ngOnInit() {
     this.cargarProgramadores();
-    this.calcularFechaMinima(); // <--- Llamamos a la función al iniciar
+    this.calcularFechaMinima();
   }
 
-  // NUEVO: Calcula la fecha de hoy en formato YYYY-MM-DD
   calcularFechaMinima() {
     const hoy = new Date();
     const yyyy = hoy.getFullYear();
@@ -53,7 +50,6 @@ export class AgendarComponent implements OnInit {
     this.minDate = `${yyyy}-${mm}-${dd}`;
   }
 
-  // ... cargarProgramadores() sigue igual ...
   async cargarProgramadores() {
     const usersRef = collection(this.firestore, 'users');
     const q = query(usersRef, where('role', '==', 'programador'));
@@ -63,9 +59,8 @@ export class AgendarComponent implements OnInit {
 
   async enviarSolicitud() {
     const user = this.auth.currentUser;
-
     if (!user) {
-      alert('Debes iniciar sesión para agendar una asesoría.');
+      alert('Debes iniciar sesión.');
       this.router.navigate(['/login']);
       return;
     }
@@ -75,17 +70,11 @@ export class AgendarComponent implements OnInit {
       return;
     }
 
-    // --- NUEVA VALIDACIÓN DE FECHA Y HORA ---
-    // Creamos una fecha combinando lo que eligió el usuario
     const fechaSeleccionada = new Date(this.solicitud.fecha + 'T' + this.solicitud.hora);
-    const ahora = new Date();
-
-    // Comparamos si la fecha seleccionada ya pasó
-    if (fechaSeleccionada < ahora) {
-      alert("No puedes agendar una cita a un dia u hora anterior.");
-      return; // Detenemos la función aquí
+    if (fechaSeleccionada < new Date()) {
+      alert('No puedes agendar en el pasado.');
+      return;
     }
-    // ----------------------------------------
 
     const progSeleccionado = this.programadores.find(p => p.uid === this.solicitud.programadorId);
 
@@ -102,9 +91,20 @@ export class AgendarComponent implements OnInit {
     };
 
     try {
-      await addDoc(collection(this.firestore, 'asesorias'), nuevaAsesoria);
-      alert('¡Solicitud enviada! El programador revisará tu petición.');
-      this.router.navigate(['/']); 
+      const docRef = await this.asesoriasService.crearAsesoria(nuevaAsesoria);
+
+      // Enviar notificación al programador
+      await this.notificacionesService.enviarNotificacion({
+        userId: nuevaAsesoria.programadorId,
+        type: 'solicitud',
+        message: `Nueva solicitud de ${nuevaAsesoria.clienteNombre} sobre "${nuevaAsesoria.tema}" el ${nuevaAsesoria.fecha} a las ${nuevaAsesoria.hora}`,
+        relatedAsesoriaId: docRef.id,
+        createdAt: new Date(),
+        read: false
+      });
+
+      alert('¡Solicitud enviada!');
+      this.router.navigate(['/']);
     } catch (error) {
       console.error(error);
       alert('Error al enviar la solicitud.');

@@ -1,8 +1,7 @@
 <div class="solicitudes-wrapper">
-
   <h1>Solicitudes Pendientes</h1>
 
-  <!-- Si no hay solicitudes -->
+  <!-- Mensaje si no hay solicitudes -->
   <div *ngIf="solicitudes.length === 0" class="no-solicitudes">
     <p>No tienes solicitudes pendientes.</p>
   </div>
@@ -12,7 +11,8 @@
     <div *ngFor="let s of solicitudes" class="card">
 
       <div class="card-header">
-        <h2>{{ s.usuarioNombre }}</h2>
+        <h2>{{ s.clienteNombre }}</h2>
+        <p class="email">{{ s.clienteEmail }}</p>
       </div>
 
       <div class="card-body">
@@ -22,11 +22,10 @@
       </div>
 
       <div class="card-actions">
-        <button class="btn aceptar" (click)="aceptar(s.id)">Aceptar</button>
-        <button class="btn rechazar" (click)="rechazar(s.id)">Rechazar</button>
+        <button class="btn aceptar" (click)="responder(s, 'Aprobada')">Aceptar</button>
+        <button class="btn rechazar" (click)="responder(s, 'Rechazada')">Rechazar</button>
       </div>
 
     </div>
   </div>
-
 </div>
