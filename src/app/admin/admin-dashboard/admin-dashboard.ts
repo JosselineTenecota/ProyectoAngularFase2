@@ -16,19 +16,15 @@ export class AdminDashboard implements OnInit {
   private firestore = inject(Firestore);
 
   users$!: Observable<Programador[]>;
-  
-  // Variables para edición (Tabla)
   editingId: string | null = null;
   editForm: any = {};
-
-  // Variables para creación (Modal)
   showCreateModal = false;
-  newUser: any = { displayName: '', email: '', role: 'programador', specialty: '', description: '', horarios: '' };
+  newUser: any = { displayName: '', email: '', role: 'programador', specialty: '', description: '' };
 
-  // NUEVO: Lista de horas fijas para el ComboBox
-  listaHorarios: string[] = [
+  // --- LISTA MAESTRA DE HORAS (Para elegir inicio y fin) ---
+  horasPosibles: string[] = [
     '08:00', '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00'
+    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
   ];
 
   ngOnInit() {
@@ -36,10 +32,14 @@ export class AdminDashboard implements OnInit {
     this.users$ = collectionData(usersRef, { idField: 'uid' }) as Observable<Programador[]>;
   }
 
-  // --- MÉTODOS DE EDICIÓN ---
   startEdit(user: Programador) {
     this.editingId = user.uid;
-    this.editForm = { ...user }; 
+    // Cargamos los datos existentes o valores por defecto
+    this.editForm = { 
+      ...user,
+      horaInicio: user.horaInicio || '08:00',
+      horaFin: user.horaFin || '17:00'
+    }; 
   }
 
   cancelEdit() {
@@ -50,17 +50,18 @@ export class AdminDashboard implements OnInit {
   async saveUser() {
     if (!this.editingId) return;
     const userRef = doc(this.firestore, `users/${this.editingId}`);
-    
     try {
       await updateDoc(userRef, {
         displayName: this.editForm.displayName,
         role: this.editForm.role,
         specialty: this.editForm.specialty || '',
         description: this.editForm.description || '',
-        // Guardamos el horario seleccionado
-        horarios: this.editForm.horarios || 'No asignado'
+        
+        // --- GUARDAMOS EL RANGO SELECCIONADO ---
+        horaInicio: this.editForm.horaInicio,
+        horaFin: this.editForm.horaFin
       });
-      alert('Usuario actualizado correctamente');
+      alert('Datos actualizados correctamente');
       this.cancelEdit();
     } catch (error) {
       console.error(error);
@@ -70,41 +71,25 @@ export class AdminDashboard implements OnInit {
 
   async deleteUser(uid: string) {
     if(confirm('¿Estás seguro de eliminar este usuario?')) {
-      const userRef = doc(this.firestore, `users/${uid}`);
-      await deleteDoc(userRef);
+      await deleteDoc(doc(this.firestore, `users/${uid}`));
     }
   }
 
-  // --- MÉTODOS DE CREACIÓN (MODAL) ---
   toggleCreateModal() {
     this.showCreateModal = !this.showCreateModal;
-    if (this.showCreateModal) {
-      this.newUser = { displayName: '', email: '', role: 'programador', specialty: '', description: '', horarios: '' };
-    }
+    if(this.showCreateModal) this.newUser = { displayName: '', email: '', role: 'programador' };
   }
 
   async createUser() {
-    if (!this.newUser.displayName || !this.newUser.email) {
-      alert('El nombre y el correo son obligatorios');
-      return;
-    }
     try {
-      const usersRef = collection(this.firestore, 'users');
-      await addDoc(usersRef, {
-        displayName: this.newUser.displayName,
-        email: this.newUser.email,
-        role: this.newUser.role,
-        specialty: this.newUser.specialty || '',
-        description: this.newUser.description || '',
-        horarios: this.newUser.horarios || '',
-        photoURL: '',
-        createdAt: new Date()
+      await addDoc(collection(this.firestore, 'users'), {
+        ...this.newUser,
+        createdAt: new Date(),
+        horaInicio: '08:00', // Valor por defecto al crear
+        horaFin: '17:00'
       });
-      alert('Usuario creado exitosamente');
+      alert('Usuario creado');
       this.toggleCreateModal();
-    } catch (error) {
-      console.error(error);
-      alert('Error al crear usuario');
-    }
+    } catch (error) { console.error(error); }
   }
 }

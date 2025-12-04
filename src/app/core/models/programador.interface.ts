@@ -5,7 +5,13 @@ export interface Programador {
   email: string;
   specialty?: string;
   description?: string;
-  horarios?: string; // <--- Esta es la línea que te falta
   role: 'admin' | 'programador' | 'usuario';
-  createdAt?: any; // Agregamos esto también por si acaso
+  
+  // --- NUEVOS CAMPOS DE RANGO ---
+  horaInicio?: string;
+  horaFin?: string;
+  // -----------------------------
+  
+  horarios?: string; // (Lo dejamos por si acaso)
+  createdAt?: any;
 }

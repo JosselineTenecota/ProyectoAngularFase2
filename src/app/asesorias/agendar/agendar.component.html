@@ -5,10 +5,13 @@
 
     <div class="form-grid">
       
-      <!-- 1. Selección de Programador -->
       <div class="form-group">
         <label>¿Con quién quieres hablar?</label>
-        <select [(ngModel)]="solicitud.programadorId" class="input-dark">
+        
+        <!-- EVENTO CHANGE: Al elegir, actualiza las horas -->
+        <select [(ngModel)]="solicitud.programadorId" 
+                (change)="actualizarHorariosDisponibles()" 
+                class="input-dark">
           <option value="" disabled selected>Selecciona un programador</option>
           <option *ngFor="let p of programadores" [value]="p.uid">
             {{ p.displayName }} - {{ p.specialty }}
@@ -16,39 +19,33 @@
         </select>
       </div>
 
-      <!-- Fila de Fecha y Hora -->
       <div class="row">
-        
-        <!-- 2. Fecha (Con bloqueo de días anteriores) -->
         <div class="form-group">
           <label>Fecha</label>
-          <input type="date" 
-                 [(ngModel)]="solicitud.fecha" 
-                 [min]="minDate" 
-                 class="input-dark">
+          <input type="date" [(ngModel)]="solicitud.fecha" [min]="minDate" class="input-dark">
         </div>
         
-        <!-- 3. Hora (Lista cerrada de 8:00 a 17:00) -->
         <div class="form-group">
-          <label>Hora (Solo horas en punto)</label>
+          <label>Hora Disponible</label>
+          
           <select [(ngModel)]="solicitud.hora" class="input-dark">
-            <option value="" disabled selected>Selecciona hora</option>
-            <option *ngFor="let h of horariosDisponibles" [value]="h">
-              {{ h }}
+            <!-- Mensaje si no hay programador -->
+            <option value="" disabled selected *ngIf="horariosDisponibles.length === 0">
+              Primero selecciona un experto
             </option>
+            
+            <!-- Lista Filtrada -->
+            <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
           </select>
+
         </div>
       </div>
 
-      <!-- 4. Motivo de la consulta -->
       <div class="form-group">
-        <label>¿Sobre qué quieres consultar?</label>
-        <textarea [(ngModel)]="solicitud.tema" rows="4" 
-          placeholder="Describe brevemente tus dudas o el proyecto..." 
-          class="input-dark"></textarea>
+        <label>Motivo</label>
+        <textarea [(ngModel)]="solicitud.tema" rows="4" class="input-dark"></textarea>
       </div>
 
-      <!-- Botón de Enviar -->
       <button class="btn-submit" (click)="enviarSolicitud()">Enviar Solicitud</button>
 
     </div>
