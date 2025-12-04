@@ -9,7 +9,7 @@ import { ProyectosService } from '../../core/services/proyectos';
 @Component({
   selector: 'app-mis-proyectos',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './mis-proyectos.html',
   styleUrls: ['./mis-proyectos.scss']
 })

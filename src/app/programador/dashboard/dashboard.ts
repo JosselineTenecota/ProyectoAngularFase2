@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Firestore, collection, addDoc, deleteDoc, doc, query, where, collectionData } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, deleteDoc, doc, query, where, collectionData, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
-// Intenta con DOS niveles hacia atrás:
 import { Proyecto } from '../../core/models/proyecto.interface';
+import { Asesoria } from '../../core/models/asesoria.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,14 +19,16 @@ export class Dashboard implements OnInit {
   private auth = inject(Auth);
 
   projects$!: Observable<Proyecto[]>;
+  asesorias$!: Observable<Asesoria[]>;
   currentUser: any;
 
-  // Objeto para el formulario de nuevo proyecto
+  // Objeto para el formulario
   newProject: Proyecto = {
     programmerId: '',
     titulo: '',
     descripcion: '',
     tipo: 'Academico',
+    participacion: 'Frontend', // <--- VALOR POR DEFECTO
     tecnologias: '',
     repoUrl: '',
     demoUrl: ''
@@ -37,16 +39,35 @@ export class Dashboard implements OnInit {
     
     if (this.currentUser) {
       this.loadMyProjects();
+      this.loadMisAsesorias();
     }
   }
 
   loadMyProjects() {
     const projectsRef = collection(this.firestore, 'projects');
-    
-    // Query: Traer proyectos donde programmerId == MI_ID
     const q = query(projectsRef, where('programmerId', '==', this.currentUser.uid));
-    
     this.projects$ = collectionData(q, { idField: 'id' }) as Observable<Proyecto[]>;
+  }
+
+  loadMisAsesorias() {
+    const asesoriasRef = collection(this.firestore, 'asesorias');
+    const q = query(asesoriasRef, where('programadorId', '==', this.currentUser.uid));
+    this.asesorias$ = collectionData(q, { idField: 'id' }) as Observable<Asesoria[]>;
+  }
+
+  async responderAsesoria(asesoriaId: string, estado: 'Aprobada' | 'Rechazada') {
+    const mensaje = prompt(`Escribe un mensaje de ${estado.toLowerCase()} (Opcional):`);
+    const docRef = doc(this.firestore, `asesorias/${asesoriaId}`);
+    try {
+      await updateDoc(docRef, {
+        estado: estado,
+        respuesta: mensaje || ''
+      });
+      alert(`La asesoría ha sido ${estado}`);
+    } catch (error) {
+      console.error(error);
+      alert('Error al actualizar la cita');
+    }
   }
 
   async addProject() {
@@ -56,9 +77,7 @@ export class Dashboard implements OnInit {
     }
 
     try {
-      // Asignamos el ID del dueño
       this.newProject.programmerId = this.currentUser.uid;
-      
       const projectsRef = collection(this.firestore, 'projects');
       await addDoc(projectsRef, this.newProject);
       
@@ -83,6 +102,7 @@ export class Dashboard implements OnInit {
       titulo: '',
       descripcion: '',
       tipo: 'Academico',
+      participacion: 'Frontend', // <--- RESETEAR ESTE CAMPO TAMBIÉN
       tecnologias: '',
       repoUrl: '',
       demoUrl: ''

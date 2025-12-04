@@ -4,8 +4,8 @@ export interface Proyecto {
   titulo: string;
   descripcion: string;
   tipo: 'Academico' | 'Laboral';
+  participacion: 'Frontend' | 'Backend' | 'Base de Datos'; // <--- NUEVO CAMPO
   tecnologias: string;
   repoUrl?: string;
   demoUrl?: string;
-  photoURL?: string; // <- opcional
 }

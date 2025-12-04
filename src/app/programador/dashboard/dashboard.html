@@ -16,11 +16,22 @@
         <input type="text" [(ngModel)]="newProject.titulo" placeholder="Ej: Sistema de Ventas" class="input-dark">
       </div>
 
+      <!-- Tipo: Académico o Laboral -->
       <div class="form-group">
-        <label>Tipo</label>
+        <label>Tipo de Proyecto</label>
         <select [(ngModel)]="newProject.tipo" class="input-dark">
           <option value="Academico">Académico</option>
           <option value="Laboral">Laboral</option>
+        </select>
+      </div>
+
+      <!-- NUEVO: Tipo de Participación -->
+      <div class="form-group">
+        <label>Tipo de Participación</label>
+        <select [(ngModel)]="newProject.participacion" class="input-dark">
+          <option value="Frontend">Frontend</option>
+          <option value="Backend">Backend</option>
+          <option value="Base de Datos">Base de Datos</option>
         </select>
       </div>
 
@@ -55,6 +66,9 @@
       <div class="project-card" *ngFor="let p of projects$ | async">
         <div class="card-header">
           <span class="badge" [class.work]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
+          <!-- Opcional: Mostrar participación visualmente -->
+          <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">{{ p.participacion }}</span>
+          
           <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
         </div>
         
@@ -74,4 +88,30 @@
     </div>
 
   </div>
+
+  <!-- SECCIÓN DE ASESORÍAS (MANTENIDA) -->
+  <div class="appointments-section">
+    <h2>Solicitudes de Asesoría</h2>
+    
+    <div class="appointments-grid">
+      <div class="appt-card" *ngFor="let cita of asesorias$ | async" [ngClass]="cita.estado.toLowerCase()">
+        <div class="appt-header">
+          <span class="status-badge" [ngClass]="cita.estado.toLowerCase()">{{ cita.estado }}</span>
+          <span class="date">{{ cita.fecha }} - {{ cita.hora }}</span>
+        </div>
+        <h3>{{ cita.clienteNombre }}</h3>
+        <p class="email-client">{{ cita.clienteEmail }}</p>
+        <div class="topic-box"><strong>Tema:</strong> {{ cita.tema }}</div>
+        <div class="answer-box" *ngIf="cita.respuesta"><strong>Tu respuesta:</strong> {{ cita.respuesta }}</div>
+        <div class="actions" *ngIf="cita.estado === 'Pendiente'">
+          <button class="btn-action approve" (click)="responderAsesoria(cita.id!, 'Aprobada')">Aprobar</button>
+          <button class="btn-action reject" (click)="responderAsesoria(cita.id!, 'Rechazada')">Rechazar</button>
+        </div>
+      </div>
+      <div *ngIf="(asesorias$ | async)?.length === 0" class="empty-state-appt">
+        No tienes solicitudes de asesoría pendientes.
+      </div>
+    </div>
+  </div>
+
 </div>
