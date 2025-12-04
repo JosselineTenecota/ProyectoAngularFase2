@@ -1,21 +1,46 @@
 <div *ngIf="loading" class="loader">Cargando proyectos...</div>
 
 <div *ngIf="proyectos$ | async as proyectos; else cargando" class="card-container">
+
   <div *ngFor="let p of proyectos" class="card">
-    <div class="card-border-top"></div>
-    <div class="img">
-      <img src="/assets/default-user.png" alt="Imagen proyecto" />
+
+    <!-- Top Section estilo Universe.io -->
+    <div class="top-section">
+      <div class="border"></div>
+      <div class="icons">
+        <div class="logo">
+          <!-- Logo simplificado sin imágenes -->
+          <div class="placeholder-icon">P</div>
+        </div>
+        <div class="social-media">
+          <div class="mini-icon"></div>
+          <div class="mini-icon"></div>
+          <div class="mini-icon"></div>
+        </div>
+      </div>
     </div>
-    <span>{{ p.titulo }}</span>
-    <p class="job">{{ p.descripcion }}</p>
-    <p class="job">Tecnologías: {{ p.tecnologias }}</p>
-    <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">
-      <button>Ver Repo</button>
-    </a>
-    <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">
-      <button>Ver Demo</button>
-    </a>
+
+    <!-- Bottom Section con tu info -->
+    <div class="bottom-section">
+      <span class="title">{{ p.titulo }}</span>
+
+      <p class="description">{{ p.descripcion }}</p>
+
+      <p class="tech">Tecnologías: {{ p.tecnologias }}</p>
+
+      <div class="button-group">
+        <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">
+          <button>Ver Repo</button>
+        </a>
+
+        <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">
+          <button>Ver Demo</button>
+        </a>
+      </div>
+    </div>
+
   </div>
+
 </div>
 
 <ng-template #cargando>
