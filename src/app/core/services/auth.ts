@@ -1,5 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from '@angular/fire/auth';
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from '@angular/fire/auth';
+
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 
@@ -12,46 +21,122 @@ export class AuthService {
   private userData = new BehaviorSubject<any>(null);
   userData$ = this.userData.asObservable();
 
+  // NUEVAS VARIABLES
+  currentUser: any = null;
+  currentRole: string | null = null;
+
   constructor() {
-    // 👇 Esto mantiene la sesión aunque recargues la página
+
+    // Mantener sesión incluso tras recargar
     onAuthStateChanged(this.auth, async (firebaseUser) => {
 
       if (!firebaseUser) {
         this.userData.next(null);
+        this.currentUser = null;
+        this.currentRole = null;
         return;
       }
 
       const userRef = doc(this.firestore, `users/${firebaseUser.uid}`);
       const snap = await getDoc(userRef);
 
-      // Si el usuario no existe en Firestore, lo creamos
+      // Si NO existe en Firestore → CREARLO
       if (!snap.exists()) {
         await setDoc(userRef, {
           uid: firebaseUser.uid,
-          name: firebaseUser.displayName,
+          name: firebaseUser.displayName || 'Usuario',
           email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
-          role: 'usuario',   // ✔ ahora TODOS entran como usuarios
+          photoURL: firebaseUser.photoURL || null,
+          role: 'usuario',
           createdAt: new Date()
         });
       }
 
-
-      // Obtenemos datos actualizados
+      // Obtener datos actualizados
       const updated = await getDoc(userRef);
-      this.userData.next(updated.data());
+      const data = updated.data();
+
+      this.currentUser = data;
+      this.currentRole = data?.['role'] ?? null;
+
+      this.userData.next(data);
     });
   }
 
+  // -------------------------
   // 🔵 LOGIN CON GOOGLE
+  // -------------------------
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(this.auth, provider);
   }
 
-  // 🔴 LOGOUT 100% funcional
+  // -------------------------
+  // 🔵 LOGIN CON EMAIL
+  // -------------------------
+  async loginWithEmail(email: string, password: string) {
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+
+    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
+    const snap = await getDoc(userRef);
+
+    // Si no existe en Firestore (raro) → lo creamos
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        uid: cred.user.uid,
+        name: cred.user.email?.split('@')[0] || 'Usuario',
+        email: cred.user.email,
+        photoURL: null,
+        role: 'usuario',
+        createdAt: new Date()
+      });
+    }
+
+    const updated = await getDoc(userRef);
+    const data = updated.data();
+
+    this.currentUser = data;
+    this.currentRole = data?.['role'] ?? null;
+
+    this.userData.next(data);
+
+    return data;
+  }
+
+  // -------------------------
+  // 🔵 REGISTRO CON EMAIL
+  // -------------------------
+  async registerWithEmail(email: string, password: string) {
+    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+
+    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
+
+    await setDoc(userRef, {
+      uid: cred.user.uid,
+      name: email.split('@')[0],
+      email,
+      photoURL: null,
+      role: 'usuario',
+      createdAt: new Date()
+    });
+
+    const data = (await getDoc(userRef)).data();
+
+    this.currentUser = data;
+    this.currentRole = data?.['role'] ?? null;
+
+    this.userData.next(data);
+
+    return data;
+  }
+
+  // -------------------------
+  // 🔴 LOGOUT
+  // -------------------------
   async logout() {
     await signOut(this.auth);
-    this.userData.next(null); // 🔥 Actualiza el navbar inmediatamente
+    this.userData.next(null);
+    this.currentUser = null;
+    this.currentRole = null;
   }
 }
