@@ -1,24 +1,31 @@
 <div class="programmers-container" *ngIf="programmers$ | async as programmers; else loading">
-    <div class="card" *ngFor="let p of programmers">
-        <div class="card-border-top"></div>
+    
+    <div class="card-client" *ngFor="let p of programmers">
 
-        <div class="img">
-            <img *ngIf="p.photoURL; else defaultImg" [src]="p.photoURL" alt="{{ p.displayName }}">
-            <ng-template #defaultImg>
-                <img src="assets/default-user.png" alt="Default user">
-            </ng-template>
+        <!-- Foto -->
+        <div class="user-picture">
+            <img *ngIf="p.photoURL; else noPhoto" [src]="p.photoURL" alt="{{ p.displayName }}">
         </div>
+        <ng-template #noPhoto>
+            <div class="user-picture">
+                <img src="assets/default-user.png" alt="Default user">
+            </div>
+        </ng-template>
 
-        <span>{{ p.displayName }}</span>
-        <p class="job">{{ p.role }}</p>
-        <p class="specialty" *ngIf="p.specialty">{{ p.specialty }}</p>
+        <!-- Nombre -->
+        <p class="name-client">
+            {{ p.displayName }}
+            <span>{{ p.specialty || 'Programador' }}</span>
+        </p>
+        <hr class="divider" />
 
-        <button [routerLink]="['/portafolio', p.uid, 'proyectos']">
+        <!-- Botón Ver proyectos -->
+        <button class="btn-proyectos" [routerLink]="['/portafolio', p.uid, 'proyectos']">
             Ver Proyectos
         </button>
 
-
     </div>
+
 </div>
 
 <ng-template #loading>
