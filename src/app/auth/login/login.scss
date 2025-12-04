@@ -1,63 +1,161 @@
+// 🎨 PALETA DE COLORES
+$bg-color: #0a0a0a;
+$card-bg: #111;
+$primary: #6a5acd;
+$primary-hover: #8a7df0;
+$google-btn-bg: #222;
+$input-bg: #1a1a1a;
+$input-border: #333;
+$text-color: #e4e4e4;
+$neon: #7b5bff;
+$neon-strong: #b49dff;
+
 .login-container {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #0f0f0f; // Fondo elegante oscuro
+  background: $bg-color;
+  padding: 20px 25px;
 }
 
+// ⭐ TARJETA LOGIN
 .login-card {
-  width: 380px;
-  padding: 40px;
-  background: #111;
-  border-radius: 20px;
+  background: $card-bg;
+  padding: 40px 60px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px; // 🔥 RESPONSIVE REAL
   text-align: center;
-  transition: 0.3s ease-in-out;
-  border: 2px solid #333;
-  box-shadow: 0 0 25px rgba(0, 255, 0, 0);
+  border: 1px solid #222;
+  transition: 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.04);
 
   &:hover {
-    border-color: #00ff66;
-    box-shadow: 0 0 35px rgba(0, 255, 120, 0.5);
-    transform: translateY(-4px);
+    box-shadow:
+      0 0 10px $neon,
+      0 0 20px $neon,
+      0 0 40px $neon-strong;
+    transform: scale(1.02);
   }
 }
 
-.title {
-  color: #fafafa;
-  margin-bottom: 25px;
-  font-size: 24px;
+// TÍTULO
+h2 {
+  color: $text-color;
+  margin-bottom: 30px;
+  font-size: 26px;
   font-weight: 600;
 }
 
+// ⭐ INPUTS perfectamente alineados con botones
+.input,
+.btn,
 .google-btn {
   width: 100%;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #111;
-  background: #ffffff;
-  border: none;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: 0.25s ease-in-out;
+  box-sizing: border-box;  // ⭐ Hace que todos tengan EXACTO el mismo tamaño
+  display: block;
+}
 
-  img {
-    width: 22px;
-    height: 22px;
+// 🌟 INPUTS (con más espacio a la derecha)
+.input {
+  padding: 16px 22px;  // ⭐ más padding lateral
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: $input-bg;
+  border: 1px solid $input-border;
+  color: $text-color;
+  font-size: 16px;
+  transition: 0.3s ease;
+
+  &::placeholder {
+    color: #aaa;
+  }
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 10px $primary;
   }
 
   &:hover {
-    background: #e6e6e6;
-    transform: scale(1.04);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    border-color: $neon;
+    box-shadow: 0 0 8px $neon;
+  }
+}
+
+// ⭐ BOTÓN GENERAL
+.btn {
+  padding: 14px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  margin-top: 10px;
+  transition: 0.3s ease;
+
+  &.primary {
+    background: $primary;
+
+    &:hover {
+      background: $primary-hover;
+      box-shadow:
+        0 0 10px $primary,
+        0 0 20px $primary;
+      transform: scale(1.03);
+    }
+  }
+}
+
+// 🌟 BOTÓN GOOGLE
+.google-btn {
+  padding: 14px 22px;
+  border-radius: 10px;
+  background: $google-btn-bg;
+  border: 1px solid #333;
+  color: $text-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: 0.3s ease;
+  font-size: 16px;
+  font-weight: 500;
+
+  img {
+    width: 20px;
   }
 
-  &:active {
-    transform: scale(0.98);
+  &:hover {
+    border-color: $neon;
+    box-shadow: 0 0 12px $neon;
+    transform: scale(1.03);
+  }
+}
+
+// SEPARADOR
+.separator {
+  margin: 20px 0;
+  color: #777;
+  font-size: 16px;
+}
+
+// 📱 RESPONSIVE
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 25px;
+    max-width: 92%;
+  }
+
+  .input {
+    padding: 15px 20px;
+  }
+
+  .btn,
+  .google-btn {
+    padding: 14px 20px;
   }
 }
