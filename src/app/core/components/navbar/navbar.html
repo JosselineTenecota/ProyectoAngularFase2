@@ -7,12 +7,14 @@
       Admin
     </a>
 
-    <!-- Menú Programador -->
+    <!-- Menú Programador (SOLO EL PANEL) -->
+    <!-- Quitamos el enlace extra de solicitudes que tenías aquí -->
     <a *ngIf="(auth.userData$ | async)?.role === 'programador'" routerLink="/programador">
       Panel Programador
     </a>
 
-    <a *ngIf="(auth.userData$ | async)?.role === 'programador'" routerLink="/programador/solicitudes">
+    <!-- Menú Usuario (SOLO EL USUARIO VE ESTO) -->
+    <a *ngIf="(auth.userData$ | async)?.role === 'usuario'" routerLink="/mis-asesorias">
       Solicitudes
     </a>
 

@@ -11,12 +11,15 @@ import { AuthService } from '../../services/auth';
   styleUrls: ['./navbar.scss']
 })
 export class Navbar {
+  // Asegúrate de que sea 'public' para que el HTML no de error
+  public auth = inject(AuthService);
+  
+  // Esta es la variable clave. Si la tienes como private, cámbiala a public
+  public user$ = this.auth.userData$; 
 
-  auth = inject(AuthService);
-  user$ = this.auth.userData$;
-
+  // ... (resto del código logout, menuOpen, etc)
   logout() {
-    this.auth.logout();
+    this.auth.logout(); 
   }
-
 }
+
