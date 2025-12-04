@@ -5,7 +5,7 @@ import { Firestore, collection, addDoc, deleteDoc, doc, query, where, collection
 import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { Proyecto } from '../../core/models/proyecto.interface';
-import { Asesoria } from '../../core/models/asesoria.interface';
+import { Asesoria } from '../../core/models/asesoria.interface'; // <--- IMPORTANTE: Tener este import
 
 @Component({
   selector: 'app-dashboard',
@@ -28,7 +28,7 @@ export class Dashboard implements OnInit {
     titulo: '',
     descripcion: '',
     tipo: 'Academico',
-    participacion: 'Frontend', // <--- VALOR POR DEFECTO
+    participacion: 'Frontend',
     tecnologias: '',
     repoUrl: '',
     demoUrl: ''
@@ -55,15 +55,32 @@ export class Dashboard implements OnInit {
     this.asesorias$ = collectionData(q, { idField: 'id' }) as Observable<Asesoria[]>;
   }
 
-  async responderAsesoria(asesoriaId: string, estado: 'Aprobada' | 'Rechazada') {
+  // --- AQUÍ ESTABA EL ERROR ---
+  // Antes recibía (id: string...), ahora recibe (asesoria: Asesoria...)
+  async responderAsesoria(asesoria: Asesoria, estado: 'Aprobada' | 'Rechazada') {
+    // 1. Pedir mensaje opcional
     const mensaje = prompt(`Escribe un mensaje de ${estado.toLowerCase()} (Opcional):`);
-    const docRef = doc(this.firestore, `asesorias/${asesoriaId}`);
+    
+    // Usamos asesoria.id para buscar el documento
+    const docRef = doc(this.firestore, `asesorias/${asesoria.id}`);
+    
     try {
+      // 2. Actualizar en Base de Datos
       await updateDoc(docRef, {
         estado: estado,
         respuesta: mensaje || ''
       });
-      alert(`La asesoría ha sido ${estado}`);
+
+      // 3. Simulación de Correo (Usamos asesoria.clienteEmail)
+      alert(`✅ SIMULACIÓN: Enviando correo de notificación a ${asesoria.clienteEmail}...\n\nAsunto: Tu asesoría fue ${estado}.\nMensaje: ${mensaje || 'Sin comentarios.'}`);
+
+      // 4. Simulación de WhatsApp
+      if (confirm('¿Deseas notificar al usuario por WhatsApp Web ahora?')) {
+        const textoWhatsapp = `Hola ${asesoria.clienteNombre}, tu solicitud de asesoría ha sido *${estado.toUpperCase()}*. ${mensaje ? 'Nota: ' + mensaje : ''}`;
+        const url = `https://wa.me/?text=${encodeURIComponent(textoWhatsapp)}`;
+        window.open(url, '_blank');
+      }
+
     } catch (error) {
       console.error(error);
       alert('Error al actualizar la cita');
@@ -102,7 +119,7 @@ export class Dashboard implements OnInit {
       titulo: '',
       descripcion: '',
       tipo: 'Academico',
-      participacion: 'Frontend', // <--- RESETEAR ESTE CAMPO TAMBIÉN
+      participacion: 'Frontend',
       tecnologias: '',
       repoUrl: '',
       demoUrl: ''

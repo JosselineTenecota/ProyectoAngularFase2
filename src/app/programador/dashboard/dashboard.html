@@ -7,7 +7,7 @@
 
   <div class="dash-grid">
     
-    <!-- COLUMNA 1: Formulario de Creación -->
+    <!-- === COLUMNA 1: Formulario de Creación === -->
     <div class="form-card">
       <h2>Nuevo Proyecto</h2>
       
@@ -16,7 +16,7 @@
         <input type="text" [(ngModel)]="newProject.titulo" placeholder="Ej: Sistema de Ventas" class="input-dark">
       </div>
 
-      <!-- Tipo: Académico o Laboral -->
+      <!-- Combo: Académico o Laboral -->
       <div class="form-group">
         <label>Tipo de Proyecto</label>
         <select [(ngModel)]="newProject.tipo" class="input-dark">
@@ -25,7 +25,7 @@
         </select>
       </div>
 
-      <!-- NUEVO: Tipo de Participación -->
+      <!-- Combo: Frontend, Backend, Base de Datos -->
       <div class="form-group">
         <label>Tipo de Participación</label>
         <select [(ngModel)]="newProject.participacion" class="input-dark">
@@ -59,16 +59,23 @@
       <button class="btn-submit" (click)="addProject()">Publicar Proyecto</button>
     </div>
 
-    <!-- COLUMNA 2: Lista de mis proyectos -->
+    <!-- === COLUMNA 2: Lista de mis proyectos === -->
     <div class="projects-list">
       <h2>Mis Proyectos Publicados</h2>
 
       <div class="project-card" *ngFor="let p of projects$ | async">
         <div class="card-header">
-          <span class="badge" [class.work]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
-          <!-- Opcional: Mostrar participación visualmente -->
-          <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">{{ p.participacion }}</span>
-          
+          <div>
+            <!-- Badge 1: Académico/Laboral -->
+            <span class="badge" [class.work]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
+            
+            <!-- Badge 2: Participación (NUEVO) -->
+            <!-- Aquí es donde se muestra si es Frontend, Backend, etc. -->
+            <span style="font-size: 0.8rem; color: #aaa; margin-left: 8px; font-weight: 600; text-transform: uppercase; border: 1px solid #444; padding: 2px 6px; border-radius: 4px;">
+               {{ p.participacion }}
+            </span>
+          </div>
+
           <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
         </div>
         
@@ -82,6 +89,7 @@
         </div>
       </div>
 
+      <!-- Mensaje si no hay proyectos -->
       <div *ngIf="(projects$ | async)?.length === 0" class="empty-state">
         <p>Aún no has subido proyectos.</p>
       </div>
@@ -89,27 +97,45 @@
 
   </div>
 
-  <!-- SECCIÓN DE ASESORÍAS (MANTENIDA) -->
+  <!-- SECCIÓN DE ASESORÍAS (PROGRAMADOR) -->
   <div class="appointments-section">
-    <h2>Solicitudes de Asesoría</h2>
+    <h2>Solicitudes de Asesoría Recibidas</h2>
     
     <div class="appointments-grid">
       <div class="appt-card" *ngFor="let cita of asesorias$ | async" [ngClass]="cita.estado.toLowerCase()">
+        
         <div class="appt-header">
+          <!-- Badge de Estado -->
           <span class="status-badge" [ngClass]="cita.estado.toLowerCase()">{{ cita.estado }}</span>
-          <span class="date">{{ cita.fecha }} - {{ cita.hora }}</span>
+          <!-- Fecha -->
+          <span class="date">📅 {{ cita.fecha }} | 🕒 {{ cita.hora }}</span>
         </div>
-        <h3>{{ cita.clienteNombre }}</h3>
-        <p class="email-client">{{ cita.clienteEmail }}</p>
-        <div class="topic-box"><strong>Tema:</strong> {{ cita.tema }}</div>
-        <div class="answer-box" *ngIf="cita.respuesta"><strong>Tu respuesta:</strong> {{ cita.respuesta }}</div>
-        <div class="actions" *ngIf="cita.estado === 'Pendiente'">
-          <button class="btn-action approve" (click)="responderAsesoria(cita.id!, 'Aprobada')">Aprobar</button>
-          <button class="btn-action reject" (click)="responderAsesoria(cita.id!, 'Rechazada')">Rechazar</button>
+
+        <div class="appt-body">
+          <h3>👤 {{ cita.clienteNombre }}</h3>
+          <span class="email-client">✉️ {{ cita.clienteEmail }}</span>
+          
+          <div class="topic-box">
+            <strong>Tema:</strong> {{ cita.tema }}
+          </div>
+
+          <!-- Muestra tu respuesta si ya respondiste -->
+          <div class="answer-box" *ngIf="cita.respuesta">
+            <strong>Tu respuesta:</strong> {{ cita.respuesta }}
+          </div>
+
+          <!-- BOTONES (Solo visibles si está PENDIENTE) -->
+          <div class="actions" *ngIf="cita.estado === 'Pendiente'">
+            <button class="btn-action approve" (click)="responderAsesoria(cita, 'Aprobada')">Aprobar</button>
+            <button class="btn-action reject" (click)="responderAsesoria(cita, 'Rechazada')">Rechazar</button>
+          </div>
         </div>
+
       </div>
+
+      <!-- Mensaje vacio -->
       <div *ngIf="(asesorias$ | async)?.length === 0" class="empty-state-appt">
-        No tienes solicitudes de asesoría pendientes.
+        No tienes solicitudes pendientes.
       </div>
     </div>
   </div>

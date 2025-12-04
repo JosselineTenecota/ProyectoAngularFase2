@@ -59,6 +59,8 @@ export const routes: Routes = [
       import('./programador/mis-proyectos/mis-proyectos').then(m => m.MisProyectos),
   },
 
+  
+
 
   // --- COMODÍN (SIEMPRE AL FINAL) ---
   { path: '**', redirectTo: '' },
