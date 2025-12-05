@@ -28,6 +28,7 @@
   padding: 0 40px;
 }
 
+/* ---------------- NAVBAR ---------------- */
 .navbar {
   position: fixed;
   top: 0;
@@ -43,8 +44,9 @@
 .nav-content {
   height: 80px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* IMPORTANTE PARA ALINEAR A LA IZQUIERDA */
   align-items: center;
+  gap: 20px; /* Espaciado entre hamburguesa y logo */
 }
 
 .logo {
@@ -54,6 +56,13 @@
   letter-spacing: 1px;
 }
 .logo span { color: #ff5252; }
+
+.menu {
+  margin-left: auto; /* Mueve el menú hacia la derecha */
+  display: flex;
+  align-items: center;
+  transition: .3s ease;
+}
 
 .menu a {
   margin-left: 30px;
@@ -70,6 +79,7 @@
   border-radius: 8px;
 }
 
+/* HERO */
 .hero {
   padding-top: 180px;
   text-align: center;
@@ -121,6 +131,7 @@
 .primario { border-color: #42a5f5; color: #42a5f5; }
 .secundario { border-color: #66bb6a; color: #66bb6a; }
 
+/* ---------------- HAMBURGUESA ---------------- */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -138,33 +149,42 @@
   border-radius: 4px;
 }
 
+/* ---------------- MÓVIL ---------------- */
 @media (max-width: 768px) {
 
   .wrapper { padding: 0 20px; }
 
   .logo { font-size: 1.4rem; }
 
-  .titulo { font-size: 2.3rem; }
+  .titulo { 
+    font-size: 2.3rem;
+    padding: 0 5px;
+  }
+  .subtitulo { 
+    font-size: 1.1rem;
+    line-height: 1.5;
+    padding: 0 5px;
 
-  .subtitulo { font-size: 1.05rem; }
+  }
 
+  /* Mostrar hamburguesa */
   .hamburger {
     display: flex;
   }
 
+  /* Menú móvil */
   .menu {
     position: absolute;
     top: 80px;
     right: 0;
     width: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.90);
     flex-direction: column;
     padding: 20px 0;
     display: none;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.1);
-
-    align-items: center !important;
+    margin-left: 0;
   }
 
   .menu.open {
@@ -178,8 +198,16 @@
 
   .login-btn {
     width: 140px;
-
     margin: 0 auto !important;
     display: inline-block !important;
+  }
+
+  .hero {
+    padding-top: 140px;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 95%;
+    margin: 0 auto;
+
   }
 }

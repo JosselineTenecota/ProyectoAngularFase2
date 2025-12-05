@@ -1,14 +1,15 @@
 <nav class="navbar">
   <div class="wrapper nav-content">
 
-    <div class="logo">PORTAFOLIO de <span>Servicios</span></div>
-
-    <!-- Botón hamburguesa para móviles -->
+    <!-- Botón hamburguesa a la izquierda -->
     <button class="hamburger" (click)="menuOpen = !menuOpen">
       <span></span><span></span><span></span>
     </button>
 
-    <!-- Menú normal escritorio -->
+    <!-- Logo -->
+    <div class="logo">PORTAFOLIO de <span>Servicios</span></div>
+
+    <!-- Menú -->
     <div class="menu" [class.open]="menuOpen">
       <a routerLink="/portafolios">Portafolios</a>
       <a routerLink="/agendar">Asesorías</a>
@@ -18,7 +19,7 @@
   </div>
 </nav>
 
-
+<!-- HERO -->
 <div class="hero wrapper">
   <h1 class="titulo">Portafolio Multi-Usuario</h1>
 
