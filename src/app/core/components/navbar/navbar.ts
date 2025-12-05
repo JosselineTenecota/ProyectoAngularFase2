@@ -11,15 +11,25 @@ import { AuthService } from '../../services/auth';
   styleUrls: ['./navbar.scss']
 })
 export class Navbar {
-  // Asegúrate de que sea 'public' para que el HTML no de error
-  public auth = inject(AuthService);
-  
-  // Esta es la variable clave. Si la tienes como private, cámbiala a public
-  public user$ = this.auth.userData$; 
 
-  // ... (resto del código logout, menuOpen, etc)
+  // 🔹 Necesario para leer login/rol en el HTML
+  public auth = inject(AuthService);
+
+  // 🔹 Observable del usuario (úsalo en *ngIf="user$ | async")
+  public user$ = this.auth.userData$;
+
+  // 🔹 Controla si el menú móvil está abierto o cerrado
+  public menuOpen: boolean = false;
+
+  constructor() { }
+
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+
   logout() {
-    this.auth.logout(); 
+    this.auth.logout();
   }
 }
-

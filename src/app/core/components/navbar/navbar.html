@@ -1,38 +1,45 @@
 <nav class="navbar">
-  <div class="left">
-    <a routerLink="/">Home</a>
 
-    <!-- Menú Admin -->
-    <a *ngIf="(auth.userData$ | async)?.role === 'admin'" routerLink="/admin">
-      Admin
-    </a>
-
-    <!-- Menú Programador (SOLO EL PANEL) -->
-    <!-- Quitamos el enlace extra de solicitudes que tenías aquí -->
-    <a *ngIf="(auth.userData$ | async)?.role === 'programador'" routerLink="/programador">
-      Panel Programador
-    </a>
-
-    <!-- Menú Usuario (SOLO EL USUARIO VE ESTO) -->
-    <a *ngIf="(auth.userData$ | async)?.role === 'usuario'" routerLink="/mis-asesorias">
-      Solicitudes
-    </a>
-
+  <!-- HAMBURGUESA (solo móvil) -->
+  <div class="hamburger" (click)="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 
+  <div class="menu-mobile" [class.open]="menuOpen">
 
-  <div class="right">
+  <a routerLink="/">Home</a>
 
-    <!-- Si NO hay usuario -->
-    <a *ngIf="!(user$ | async)" routerLink="/login">Iniciar sesión</a>
+  <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">
+    Panel Programador
+  </a>
 
-    <!-- Si HAY usuario -->
-    <div *ngIf="user$ | async as user" class="user-info">
-      <img [src]="user.photoURL" alt="Foto usuario" />
+  <a *ngIf="auth.currentRole === 'usuario'" routerLink="/mis-asesorias">
+    Mis Asesorías
+  </a>
+
+  <button (click)="logout()" class="logout-btn">
+    Cerrar sesión
+  </button>
+
+</div>
+
+
+  <!-- LINKS IZQUIERDA -->
+  <div class="nav-links">
+    <a routerLink="/">Home</a>
+    <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">Panel Programador</a>
+  </div>
+
+  <!-- DERECHA: USER + CERRAR SESIÓN -->
+  <div class="right-section">
+    <div class="user-info" *ngIf="user$ | async as user">
+      <img [src]="user.photoURL || 'assets/user.png'" alt="User">
       <span>{{ user.name }}</span>
-
-      <button (click)="logout()">Cerrar sesión</button>
     </div>
 
+    <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
   </div>
+
 </nav>
