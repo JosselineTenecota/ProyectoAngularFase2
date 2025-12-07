@@ -21,22 +21,18 @@ export class AgendarComponent implements OnInit {
 
   programadores: Programador[] = [];
   
-  // Todas las horas posibles
-  horasMaestras: string[] = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
-  ];
-
-  // Esta lista se llena según lo que configuró el Admin
+  // Todas las horas posibles (El admin recorta esto)
+  horasMaestras: string[] = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+  
+  // Lista que ve el usuario
   horariosDisponibles: string[] = [];
-
+  
   minDate: string = '';
   solicitud: any = { programadorId: '', fecha: '', hora: '', tema: '' };
 
   ngOnInit() {
     this.cargarProgramadores();
-    
-    // Bloquear fechas pasadas en el calendario
+    // Bloquear fechas pasadas
     const hoy = new Date();
     this.minDate = hoy.toISOString().split('T')[0];
   }
@@ -48,43 +44,32 @@ export class AgendarComponent implements OnInit {
     this.programadores = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as Programador));
   }
 
-  // --- LÓGICA DE RANGO DE HORAS (Lo que pidió el Admin) ---
+  // --- LÓGICA DE FILTRADO DE HORAS ---
   actualizarHorariosDisponibles() {
     const prog = this.programadores.find(p => p.uid === this.solicitud.programadorId);
-    
     if (prog) {
-      // Si el admin no configuró nada, usamos 8 a 17 por defecto
+      // Si el admin configuró rango, lo usamos. Si no, usamos 8 a 17 por defecto.
       const inicio = prog.horaInicio || '08:00';
       const fin = prog.horaFin || '17:00';
 
-      // Filtramos la lista maestra
       this.horariosDisponibles = this.horasMaestras.filter(h => h >= inicio && h < fin);
-      
-      // Reseteamos la hora para obligar a elegir de nuevo
-      this.solicitud.hora = ''; 
+      this.solicitud.hora = ''; // Resetear hora
     }
   }
 
   async enviarSolicitud() {
     const user = this.auth.currentUser;
-
     if (!user) {
       alert('Debes iniciar sesión para agendar.');
       this.router.navigate(['/login']);
       return;
     }
 
-    // Validación doble (visual y lógica)
-    if (!this.solicitud.programadorId || !this.solicitud.fecha || !this.solicitud.hora || !this.solicitud.tema) {
-      alert('Por favor completa todos los campos obligatorios.');
-      return;
-    }
-
-    // Validar que no sea fecha/hora pasada (por seguridad)
+    // Validar fecha pasada
     const fechaSeleccionada = new Date(this.solicitud.fecha + 'T' + this.solicitud.hora);
     const ahora = new Date();
     if (fechaSeleccionada < ahora) {
-      alert("No puedes agendar una cita en el pasado.");
+      alert("No puedes agendar en el pasado.");
       return;
     }
 
@@ -105,11 +90,11 @@ export class AgendarComponent implements OnInit {
 
         await addDoc(collection(this.firestore, 'asesorias'), nuevaAsesoria);
         
-        alert('¡Solicitud Enviada Exitosamente!');
-        this.router.navigate(['/mis-asesorias']); // Redirigir a la lista
+        alert('¡Solicitud Enviada!');
+        this.router.navigate(['/mis-asesorias']);
     } catch(e) { 
         console.error(e);
-        alert('Error al enviar la solicitud');
+        alert('Error al enviar');
     }
   }
 }

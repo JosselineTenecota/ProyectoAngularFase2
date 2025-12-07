@@ -1,19 +1,18 @@
 <div class="agendar-wrapper wrapper">
   <div class="form-container">
+    
     <h1>Agendar Asesoría</h1>
-    <p>Selecciona un experto y reserva tu espacio.</p>
+    <p class="subtitle">Selecciona un experto y reserva tu espacio.</p>
 
     <div class="form-grid">
       
-      <!-- 1. PROGRAMADOR (Obligatorio) -->
+      <!-- 1. EXPERTO -->
       <div class="form-group">
         <label>¿Con quién quieres hablar?</label>
-        
-        <!-- (change) dispara la actualización de horas -->
         <select [(ngModel)]="solicitud.programadorId" 
-                name="programador"
-                required
-                #prog="ngModel"
+                name="progId" 
+                required 
+                #progRef="ngModel"
                 (change)="actualizarHorariosDisponibles()" 
                 class="input-dark">
           <option value="" disabled selected>Selecciona un programador</option>
@@ -21,74 +20,68 @@
             {{ p.displayName }} - {{ p.specialty }}
           </option>
         </select>
-
-        <span *ngIf="prog.invalid && (prog.dirty || prog.touched)" class="error-msg">
-          * Debes seleccionar un experto.
+        <!-- Mensaje de error discreto -->
+        <span *ngIf="progRef.invalid && (progRef.dirty || progRef.touched)" class="error-text">
+          * Selecciona un experto
         </span>
       </div>
 
+      <!-- FILA: FECHA Y HORA -->
       <div class="row">
         
-        <!-- 2. FECHA (Obligatorio) -->
+        <!-- 2. FECHA -->
         <div class="form-group">
           <label>Fecha</label>
           <input type="date" 
                  [(ngModel)]="solicitud.fecha" 
-                 name="fecha"
-                 required
-                 #fecha="ngModel"
+                 name="fecha" 
+                 required 
+                 #dateRef="ngModel"
                  [min]="minDate" 
                  class="input-dark">
-          
-          <span *ngIf="fecha.invalid && (fecha.dirty || fecha.touched)" class="error-msg">
-            * Fecha requerida.
+          <span *ngIf="dateRef.invalid && (dateRef.dirty || dateRef.touched)" class="error-text">
+            * Requerido
           </span>
         </div>
         
-        <!-- 3. HORA (Dinámica y Obligatoria) -->
+        <!-- 3. HORA (Filtrada por el Admin) -->
         <div class="form-group">
           <label>Hora Disponible</label>
           <select [(ngModel)]="solicitud.hora" 
-                  name="hora"
-                  required
-                  #hora="ngModel"
+                  name="hora" 
+                  required 
+                  #timeRef="ngModel"
                   class="input-dark">
             
-            <!-- Mensajes dinámicos en el select -->
-            <option value="" disabled selected *ngIf="!solicitud.programadorId">
-              Primero elige experto
-            </option>
-            <option value="" disabled selected *ngIf="solicitud.programadorId && horariosDisponibles.length === 0">
-              Sin horarios disponibles
-            </option>
+            <!-- Mensajes de ayuda en el select -->
+            <option value="" disabled selected *ngIf="!solicitud.programadorId">Primero elige experto</option>
+            <option value="" disabled selected *ngIf="solicitud.programadorId">Selecciona hora</option>
             
-            <!-- Lista de horas filtrada por el Admin -->
+            <!-- Horas dinámicas -->
             <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
           </select>
-
-          <span *ngIf="hora.invalid && (hora.dirty || hora.touched)" class="error-msg">
-            * Selecciona una hora.
+          <span *ngIf="timeRef.invalid && (timeRef.dirty || timeRef.touched)" class="error-text">
+            * Requerido
           </span>
         </div>
+
       </div>
 
-      <!-- 4. MOTIVO (Obligatorio) -->
+      <!-- 4. MOTIVO -->
       <div class="form-group">
         <label>Motivo</label>
         <textarea [(ngModel)]="solicitud.tema" 
-                  name="tema"
+                  name="tema" 
+                  required 
+                  #temaRef="ngModel"
                   rows="4" 
-                  required
-                  #tema="ngModel"
-                  placeholder="Describe brevemente tus dudas..." 
                   class="input-dark"></textarea>
-        
-        <span *ngIf="tema.invalid && (tema.dirty || tema.touched)" class="error-msg">
-          * Cuéntanos el motivo de la cita.
+        <span *ngIf="temaRef.invalid && (temaRef.dirty || temaRef.touched)" class="error-text">
+          * Cuéntanos el motivo
         </span>
       </div>
 
-      <!-- BOTÓN (Deshabilitado si falta algo) -->
+      <!-- BOTÓN VERDE (Se opaca si falta algo) -->
       <button class="btn-submit" 
               (click)="enviarSolicitud()"
               [disabled]="!solicitud.programadorId || !solicitud.fecha || !solicitud.hora || !solicitud.tema">
