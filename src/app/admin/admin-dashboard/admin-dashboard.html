@@ -2,7 +2,7 @@
   <div class="admin-header-flex">
     <div class="header-text">
       <h1>Panel de Administración</h1>
-      <p>Gestiona usuarios y horarios.</p>
+      <p>Gestiona usuarios, horarios y enlaces de contacto.</p>
     </div>
     <button class="btn-create" (click)="toggleCreateModal()">+ Nuevo Usuario</button>
   </div>
@@ -14,45 +14,76 @@
           <th>Usuario</th>
           <th>Rol</th>
           <th>Especialidad</th>
-          <th>Rango Horario</th> <!-- COLUMNA MODIFICADA -->
+          <th>Rango Horario</th>
+          <th>Contacto</th>
+          <th>Redes</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of users$ | async">
-
-          <!-- === MODO VISTA === -->
+          
+          <!-- ================= MODO VISTA (Lectura) ================= -->
           <ng-container *ngIf="editingId !== user.uid">
             <td>
               <div class="user-info">
-                <img [src]="user.photoURL || 'https://ui-avatars.com/api/?name='+(user.displayName||user.email)"
-                  class="avatar">
+                <img [src]="user.photoURL || 'https://ui-avatars.com/api/?name='+(user.displayName||user.email)" class="avatar">
                 <div>
                   <div class="name">{{ user.displayName || 'Sin Nombre' }}</div>
                   <div class="email">{{ user.email }}</div>
                 </div>
               </div>
             </td>
+            
             <td><span class="role-badge" [ngClass]="user.role">{{ user.role }}</span></td>
+            
             <td>{{ user.specialty || '---' }}</td>
-
-            <!-- VISTA DEL RANGO -->
+            
+            <!-- Rango Horario -->
             <td>
               <span *ngIf="user.role === 'programador'" class="time-badge">
                 {{ user.horaInicio || '08:00' }} - {{ user.horaFin || '17:00' }}
               </span>
-              <span *ngIf="user.role !== 'programador'" style="color: #444; font-size: 0.8rem;">N/A</span>
+              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
             </td>
 
+            <!-- Contacto (Muestra el texto) -->
             <td>
-              <button class="btn-icon edit" (click)="startEdit(user)">✎</button>
-              <button class="btn-icon delete" (click)="deleteUser(user.uid)">🗑</button>
+              <a *ngIf="user.role === 'programador' && user.contactUrl" 
+                 [href]="user.contactUrl" 
+                 target="_blank" 
+                 class="link-text"
+                 title="{{ user.contactUrl }}">
+                 {{ user.contactUrl }}
+              </a>
+              <span *ngIf="user.role === 'programador' && !user.contactUrl" class="na-text">---</span>
+              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
+            </td>
+
+            <!-- Redes (Muestra el texto) -->
+            <td>
+              <a *ngIf="user.role === 'programador' && user.socialUrl" 
+                 [href]="user.socialUrl" 
+                 target="_blank" 
+                 class="link-text"
+                 title="{{ user.socialUrl }}">
+                 {{ user.socialUrl }}
+              </a>
+              <span *ngIf="user.role === 'programador' && !user.socialUrl" class="na-text">---</span>
+              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
+            </td>
+
+            <!-- Botones de Acción (Con color) -->
+            <td>
+              <button class="btn-icon edit" (click)="startEdit(user)" title="Editar">✎</button>
+              <button class="btn-icon delete" (click)="deleteUser(user.uid)" title="Eliminar">🗑</button>
             </td>
           </ng-container>
 
-          <!-- === MODO EDICIÓN === -->
+          <!-- ================= MODO EDICIÓN (Formulario) ================= -->
           <ng-container *ngIf="editingId === user.uid">
             <td><input type="text" [(ngModel)]="editForm.displayName" class="input-dark"></td>
+            
             <td>
               <select [(ngModel)]="editForm.role" class="input-dark">
                 <option value="usuario">Usuario</option>
@@ -60,25 +91,28 @@
                 <option value="admin">Admin</option>
               </select>
             </td>
+            
             <td><input type="text" [(ngModel)]="editForm.specialty" class="input-dark"></td>
-
-            <!-- EDICIÓN DEL RANGO (Dos Selects) -->
+            
+            <!-- Edición Rango -->
             <td>
-              <div *ngIf="editForm.role === 'programador'" style="display: flex; gap: 5px; flex-direction: column;">
-                <div style="display: flex; gap: 5px; align-items: center;">
-                  <span style="color:#888; font-size: 0.8rem; width: 40px;">Desde:</span>
-                  <select [(ngModel)]="editForm.horaInicio" class="input-dark">
-                    <option *ngFor="let h of horasPosibles" [value]="h">{{ h }}</option>
-                  </select>
-                </div>
-                <div style="display: flex; gap: 5px; align-items: center;">
-                  <span style="color:#888; font-size: 0.8rem; width: 40px;">Hasta:</span>
-                  <select [(ngModel)]="editForm.horaFin" class="input-dark">
-                    <option *ngFor="let h of horasPosibles" [value]="h">{{ h }}</option>
-                  </select>
-                </div>
+              <div *ngIf="editForm.role === 'programador'" style="display:flex; flex-direction:column; gap:5px;">
+                <select [(ngModel)]="editForm.horaInicio" class="input-dark"><option *ngFor="let h of horasPosibles" [value]="h">{{h}}</option></select>
+                <select [(ngModel)]="editForm.horaFin" class="input-dark"><option *ngFor="let h of horasPosibles" [value]="h">{{h}}</option></select>
               </div>
-              <span *ngIf="editForm.role !== 'programador'">N/A</span>
+              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
+            </td>
+
+            <!-- Edición Contacto -->
+            <td>
+              <input *ngIf="editForm.role === 'programador'" type="text" [(ngModel)]="editForm.contactUrl" placeholder="WhatsApp/Tel" class="input-dark">
+              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
+            </td>
+
+            <!-- Edición Redes -->
+            <td>
+              <input *ngIf="editForm.role === 'programador'" type="text" [(ngModel)]="editForm.socialUrl" placeholder="LinkedIn/Git" class="input-dark">
+              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
             </td>
 
             <td>
@@ -93,53 +127,17 @@
   </div>
 </div>
 
-<!-- Modal sigue igual al anterior -->
+<!-- Modal para crear usuario (Se mantiene igual) -->
 <div class="modal-overlay" *ngIf="showCreateModal">
   <div class="modal-content">
     <h2>Registrar Nuevo Usuario</h2>
-    <div class="form-group">
-      <label>Nombre</label>
-      <input type="text" [(ngModel)]="newUser.displayName" class="input-dark">
-    </div>
-    <div class="form-group">
-      <label>Correo</label>
-      <input type="email" [(ngModel)]="newUser.email" class="input-dark">
-    </div>
-    <div class="form-group">
-      <label>Rol</label>
+    <div class="form-group"><label>Nombre</label><input type="text" [(ngModel)]="newUser.displayName" class="input-dark"></div>
+    <div class="form-group"><label>Correo</label><input type="email" [(ngModel)]="newUser.email" class="input-dark"></div>
+    <div class="form-group"><label>Rol</label>
       <select [(ngModel)]="newUser.role" class="input-dark">
-        <option value="usuario">Usuario</option>
-        <option value="programador">Programador</option>
-        <option value="admin">Administrador</option>
+        <option value="usuario">Usuario</option><option value="programador">Programador</option><option value="admin">Admin</option>
       </select>
     </div>
-
-    <div class="form-group" *ngIf="newUser.role === 'programador'">
-      <label>Especialidad</label>
-      <input type="text" [(ngModel)]="newUser.specialty" class="input-dark"
-        placeholder="Ej: Frontend, Backend, Bases de datos" />
-    </div>
-
-    <div class="form-group" *ngIf="newUser.role === 'programador'">
-      <label>Horario de trabajo</label>
-
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div>
-          <label style="font-size: 0.8rem; color: #aaa;">Hora de entrada</label>
-          <select [(ngModel)]="newUser.horaInicio" class="input-dark">
-            <option *ngFor="let hora of horasPosibles" [value]="hora">{{ hora }}</option>
-          </select>
-        </div>
-
-        <div>
-          <label style="font-size: 0.8rem; color: #aaa;">Hora de salida</label>
-          <select [(ngModel)]="newUser.horaFin" class="input-dark">
-            <option *ngFor="let hora of horasPosibles" [value]="hora">{{ hora }}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" (click)="toggleCreateModal()">Cancelar</button>
       <button class="btn-save" (click)="createUser()">Crear</button>

@@ -7,11 +7,15 @@ export interface Programador {
   description?: string;
   role: 'admin' | 'programador' | 'usuario';
   
-  // --- NUEVOS CAMPOS DE RANGO ---
+  // Rango de Horarios
   horaInicio?: string;
   horaFin?: string;
-  // -----------------------------
   
-  horarios?: string; // (Lo dejamos por si acaso)
+  // --- NUEVOS CAMPOS ---
+  contactUrl?: string; // Ej: WhatsApp link o teléfono
+  socialUrl?: string;  // Ej: LinkedIn o GitHub
+  // -------------------
+
+  horarios?: string;
   createdAt?: any;
 }

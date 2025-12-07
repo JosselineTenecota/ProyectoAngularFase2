@@ -19,13 +19,9 @@ export class AdminDashboard implements OnInit {
   editingId: string | null = null;
   editForm: any = {};
   showCreateModal = false;
-  newUser: any = { displayName: '', email: '', role: 'programador', specialty: '', description: '' };
+  newUser: any = { displayName: '', email: '', role: 'programador' };
 
-  // --- LISTA MAESTRA DE HORAS (Para elegir inicio y fin) ---
-  horasPosibles: string[] = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
-  ];
+  horasPosibles: string[] = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 
   ngOnInit() {
     const usersRef = collection(this.firestore, 'users');
@@ -34,11 +30,12 @@ export class AdminDashboard implements OnInit {
 
   startEdit(user: Programador) {
     this.editingId = user.uid;
-    // Cargamos los datos existentes o valores por defecto
     this.editForm = { 
       ...user,
       horaInicio: user.horaInicio || '08:00',
-      horaFin: user.horaFin || '17:00'
+      horaFin: user.horaFin || '17:00',
+      contactUrl: user.contactUrl || '',
+      socialUrl: user.socialUrl || ''
     }; 
   }
 
@@ -56,23 +53,18 @@ export class AdminDashboard implements OnInit {
         role: this.editForm.role,
         specialty: this.editForm.specialty || '',
         description: this.editForm.description || '',
-        
-        // --- GUARDAMOS EL RANGO SELECCIONADO ---
         horaInicio: this.editForm.horaInicio,
-        horaFin: this.editForm.horaFin
+        horaFin: this.editForm.horaFin,
+        contactUrl: this.editForm.contactUrl || '',
+        socialUrl: this.editForm.socialUrl || ''
       });
-      alert('Datos actualizados correctamente');
+      alert('Datos actualizados');
       this.cancelEdit();
-    } catch (error) {
-      console.error(error);
-      alert('Error al actualizar');
-    }
+    } catch (error) { console.error(error); alert('Error'); }
   }
 
   async deleteUser(uid: string) {
-    if(confirm('¿Estás seguro de eliminar este usuario?')) {
-      await deleteDoc(doc(this.firestore, `users/${uid}`));
-    }
+    if(confirm('¿Estás seguro?')) await deleteDoc(doc(this.firestore, `users/${uid}`));
   }
 
   toggleCreateModal() {
@@ -85,8 +77,10 @@ export class AdminDashboard implements OnInit {
       await addDoc(collection(this.firestore, 'users'), {
         ...this.newUser,
         createdAt: new Date(),
-        horaInicio: '08:00', // Valor por defecto al crear
-        horaFin: '17:00'
+        horaInicio: '08:00',
+        horaFin: '17:00',
+        contactUrl: '',
+        socialUrl: ''
       });
       alert('Usuario creado');
       this.toggleCreateModal();
