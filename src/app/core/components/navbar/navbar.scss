@@ -8,6 +8,7 @@
   padding: 0 25px;
   gap: 20px;
   position: relative; /* necesario para menu mobile */
+  box-sizing: border-box;   /* 🔥 esto lo arregla */
 }
 
 .accion-movil
