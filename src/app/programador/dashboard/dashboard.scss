@@ -271,3 +271,16 @@ h3 { margin: 0; font-size: 1.1rem; color: #fff; }
   &.reject { background: #ff5252; }
   &:hover { opacity: 0.9; transform: translateY(-2px); }
 }
+
+/* --- Estilos de Validación --- */
+.error-msg {
+  color: #ff5252; /* Rojo brillante */
+  font-size: 0.85rem;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Cuando el input es inválido y ya fue tocado por el usuario */
+.input-dark.ng-invalid.ng-touched {
+  border-color: #ff5252 !important;
+}

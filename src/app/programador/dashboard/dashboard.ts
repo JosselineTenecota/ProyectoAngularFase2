@@ -5,7 +5,7 @@ import { Firestore, collection, addDoc, deleteDoc, doc, query, where, collection
 import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { Proyecto } from '../../core/models/proyecto.interface';
-import { Asesoria } from '../../core/models/asesoria.interface'; // <--- IMPORTANTE: Tener este import
+import { Asesoria } from '../../core/models/asesoria.interface'; 
 
 @Component({
   selector: 'app-dashboard',
@@ -28,7 +28,7 @@ export class Dashboard implements OnInit {
     titulo: '',
     descripcion: '',
     tipo: 'Academico',
-    participacion: 'Frontend',
+    participacion: 'Frontend', // Valor por defecto
     tecnologias: '',
     repoUrl: '',
     demoUrl: ''
@@ -45,23 +45,24 @@ export class Dashboard implements OnInit {
 
   loadMyProjects() {
     const projectsRef = collection(this.firestore, 'projects');
+    // Carga solo los proyectos de este programador
     const q = query(projectsRef, where('programmerId', '==', this.currentUser.uid));
     this.projects$ = collectionData(q, { idField: 'id' }) as Observable<Proyecto[]>;
   }
 
   loadMisAsesorias() {
     const asesoriasRef = collection(this.firestore, 'asesorias');
+    // Carga las solicitudes dirigidas a este programador
     const q = query(asesoriasRef, where('programadorId', '==', this.currentUser.uid));
     this.asesorias$ = collectionData(q, { idField: 'id' }) as Observable<Asesoria[]>;
   }
 
-  // --- AQUÍ ESTABA EL ERROR ---
-  // Antes recibía (id: string...), ahora recibe (asesoria: Asesoria...)
+  // --- LÓGICA DE RESPUESTA Y SIMULACIÓN (Requerimiento 6) ---
   async responderAsesoria(asesoria: Asesoria, estado: 'Aprobada' | 'Rechazada') {
-    // 1. Pedir mensaje opcional
+    // 1. Pedir mensaje opcional (Nativo)
     const mensaje = prompt(`Escribe un mensaje de ${estado.toLowerCase()} (Opcional):`);
     
-    // Usamos asesoria.id para buscar el documento
+    // Referencia al documento en Firebase
     const docRef = doc(this.firestore, `asesorias/${asesoria.id}`);
     
     try {
@@ -71,10 +72,10 @@ export class Dashboard implements OnInit {
         respuesta: mensaje || ''
       });
 
-      // 3. Simulación de Correo (Usamos asesoria.clienteEmail)
+      // 3. Simulación de Correo (Alerta visual)
       alert(`✅ SIMULACIÓN: Enviando correo de notificación a ${asesoria.clienteEmail}...\n\nAsunto: Tu asesoría fue ${estado}.\nMensaje: ${mensaje || 'Sin comentarios.'}`);
 
-      // 4. Simulación de WhatsApp
+      // 4. Simulación de WhatsApp (Confirmación para abrir link)
       if (confirm('¿Deseas notificar al usuario por WhatsApp Web ahora?')) {
         const textoWhatsapp = `Hola ${asesoria.clienteNombre}, tu solicitud de asesoría ha sido *${estado.toUpperCase()}*. ${mensaje ? 'Nota: ' + mensaje : ''}`;
         const url = `https://wa.me/?text=${encodeURIComponent(textoWhatsapp)}`;
@@ -87,14 +88,18 @@ export class Dashboard implements OnInit {
     }
   }
 
+  // --- AGREGAR PROYECTO ---
   async addProject() {
+    // Validación de seguridad
     if (!this.newProject.titulo || !this.newProject.descripcion) {
       alert('El título y la descripción son obligatorios');
       return;
     }
 
     try {
+      // Asignamos el ID del usuario actual al proyecto
       this.newProject.programmerId = this.currentUser.uid;
+      
       const projectsRef = collection(this.firestore, 'projects');
       await addDoc(projectsRef, this.newProject);
       
@@ -106,6 +111,7 @@ export class Dashboard implements OnInit {
     }
   }
 
+  // --- ELIMINAR PROYECTO ---
   async deleteProject(projectId: string) {
     if (confirm('¿Eliminar este proyecto? No se puede deshacer.')) {
       const docRef = doc(this.firestore, `projects/${projectId}`);
@@ -113,13 +119,14 @@ export class Dashboard implements OnInit {
     }
   }
 
+  // --- RESETEAR FORMULARIO ---
   resetForm() {
     this.newProject = {
       programmerId: '',
       titulo: '',
       descripcion: '',
       tipo: 'Academico',
-      participacion: 'Frontend',
+      participacion: 'Frontend', // Reseteamos al valor por defecto
       tecnologias: '',
       repoUrl: '',
       demoUrl: ''
