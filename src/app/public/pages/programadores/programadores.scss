@@ -9,11 +9,11 @@
 
 /* --- CARD STYLE --- */
 .card-client {
-  background: #2b1540; /* Morado oscuro casi negro */
+  background: #2b1540; 
   width: 14rem;
   padding: 25px 20px;
-  border: 3px solid #7b2cbf; /* Morado vibrante */
-  box-shadow: 0 6px 15px rgba(123, 44, 191, 0.35); /* Sombra morada suave */
+  border: 3px solid #7b2cbf; 
+  box-shadow: 0 6px 15px rgba(123, 44, 191, 0.35); 
   border-radius: 14px;
   text-align: center;
   color: #f2e9fe;
@@ -31,7 +31,7 @@
   overflow: hidden;
   width: 5rem;
   height: 5rem;
-  border: 3px solid #9d4edd; /* Acento morado claro */
+  border: 3px solid #9d4edd; 
   border-radius: 999px;
   display: flex;
   justify-content: center;
@@ -74,7 +74,7 @@
   margin-top: 15px;
   padding: 10px 22px;
   width: 100%;
-  background: #6a1b9a; /* Morado profundo */
+  background: #6a1b9a; 
   border: none;
   border-radius: 8px;
   color: white;
@@ -84,7 +84,7 @@
 }
 
 .btn-proyectos:hover {
-  background: #4a1470; /* Morado más intenso */
+  background: #4a1470; 
 }
 
 /* MOBILE RESPONSIVE */

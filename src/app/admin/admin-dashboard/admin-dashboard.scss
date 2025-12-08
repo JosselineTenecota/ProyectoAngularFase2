@@ -39,18 +39,17 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-al
 
 .na-text { color: #444; font-size: 0.8rem; font-style: italic; }
 
-/* NUEVO: ESTILO PARA LINKS (Corta el texto si es muy largo) */
+
 .link-text {
   color: #42a5f5; text-decoration: none; font-size: 0.85rem;
   display: block;
   max-width: 150px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Pone ... */
+  text-overflow: ellipsis; 
   &:hover { text-decoration: underline; color: #fff; }
 }
 
-/* NUEVO: COLORES PARA BOTONES DE ACCIÓN */
 .btn-icon {
   background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-right: 5px;
   color: #888; /* Color base */

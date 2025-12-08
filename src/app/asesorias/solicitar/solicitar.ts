@@ -7,13 +7,13 @@ import { Observable } from 'rxjs';
 import { Asesoria } from '../../core/models/asesoria.interface';
 
 @Component({
-  selector: 'app-solicitar', // Puede que se llame app-solicitar o app-solicitar-component
+  selector: 'app-solicitar', 
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './solicitar.html',
   styleUrls: ['./solicitar.scss']
 })
-export class Solicitar implements OnInit { // Verifica si tu clase se llama Solicitar o SolicitarComponent
+export class Solicitar implements OnInit { 
   private firestore = inject(Firestore);
   private auth = inject(Auth);
 

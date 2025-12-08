@@ -12,13 +12,13 @@ import { AuthService } from '../../services/auth';
 })
 export class Navbar {
 
-  // 🔹 Necesario para leer login/rol en el HTML
+  // Necesario para leer login/rol en el HTML
   public auth = inject(AuthService);
 
-  // 🔹 Observable del usuario (úsalo en *ngIf="user$ | async")
+  //Observable del usuario (úsalo en *ngIf="user$ | async")
   public user$ = this.auth.userData$;
 
-  // 🔹 Controla si el menú móvil está abierto o cerrado
+  // Controla si el menú móvil está abierto o cerrado
   public menuOpen: boolean = false;
 
   constructor() { }

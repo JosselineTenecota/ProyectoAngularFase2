@@ -35,10 +35,10 @@
     <!-- Panel para Programador -->
     <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">Panel Programador</a>
 
-    <!-- Panel para Admin (Agregado por si acaso) -->
+    <!-- Panel para Admin -->
     <a *ngIf="auth.currentRole === 'admin'" routerLink="/admin">Admin</a>
 
-    <!-- AQUÍ FALTABA ESTO: Panel para Usuario -->
+    <!-- Panel para Usuario -->
     <a *ngIf="auth.currentRole === 'usuario'" routerLink="/mis-asesorias">Mis Asesorías</a>
   </div>
 

@@ -65,7 +65,7 @@ export class AuthService {
   }
 
   // -------------------------
-  // 🔵 LOGIN CON GOOGLE
+  // LOGIN CON GOOGLE
   // -------------------------
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   // -------------------------
-  // 🔵 LOGIN CON EMAIL
+  // LOGIN CON EMAIL
   // -------------------------
   async loginWithEmail(email: string, password: string) {
     const cred = await signInWithEmailAndPassword(this.auth, email, password);
@@ -105,7 +105,7 @@ export class AuthService {
   }
 
   // -------------------------
-  // 🔵 REGISTRO CON EMAIL
+  // REGISTRO CON EMAIL
   // -------------------------
   async registerWithEmail(email: string, password: string) {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -132,7 +132,7 @@ export class AuthService {
   }
 
   // -------------------------
-  // 🔴 LOGOUT (CORREGIDO)
+  // LOGOUT (CORREGIDO)
   //–-------------------------
   async logout() {
     try {

@@ -2,7 +2,7 @@ import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 
-import { routes } from './app.routes'; // Asumiendo que tus rutas están aquí
+import { routes } from './app.routes'; 
 import { environment } from '../environments/environment'; // Importar la configuración
 
 

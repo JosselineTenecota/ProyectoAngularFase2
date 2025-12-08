@@ -4,7 +4,7 @@ import { Firestore, collection, collectionData, doc, updateDoc, deleteDoc, addDo
 import { Observable } from 'rxjs';
 import { Programador } from '../../core/models/programador.interface';
 import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2'; // <--- IMPORTANTE
+import Swal from 'sweetalert2'; 
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -64,7 +64,7 @@ export class AdminDashboard implements OnInit {
         socialUrl: this.editForm.socialUrl || ''
       });
 
-      // ALERTA BONITA
+    
       Swal.fire({
         icon: 'success',
         title: 'Actualizado',
@@ -81,7 +81,7 @@ export class AdminDashboard implements OnInit {
   }
 
   async deleteUser(uid: string) {
-    // CONFIRMACIÓN BONITA
+    
     const result = await Swal.fire({
       title: '¿Estás seguro?',
       text: "Se eliminará este usuario y no podrás recuperarlo.",
@@ -105,7 +105,7 @@ export class AdminDashboard implements OnInit {
   }
 
   async createUser() {
-    // VALIDACIÓN BONITA
+  
     if (!this.newUser.displayName || !this.newUser.email) {
       Swal.fire('Faltan datos', 'Nombre y Correo son obligatorios', 'warning');
       return;
@@ -121,7 +121,7 @@ export class AdminDashboard implements OnInit {
         socialUrl: ''
       });
 
-      // ÉXITO BONITO
+     
       Swal.fire({
         icon: 'success',
         title: 'Usuario Creado',

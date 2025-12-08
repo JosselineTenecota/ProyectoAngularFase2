@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Firestore, collection, query, where, getDocs, addDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
-import Swal from 'sweetalert2'; // <--- IMPORTANTE
+import Swal from 'sweetalert2'; 
 import { Programador } from '../../core/models/programador.interface';
 import { Asesoria } from '../../core/models/asesoria.interface';
 

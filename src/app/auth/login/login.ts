@@ -29,7 +29,7 @@ export class Login {
   }
 
   // -----------------------------------
-  // 🔵 LOGIN CON EMAIL
+  // LOGIN CON EMAIL
   // -----------------------------------
   async loginEmail() {
     try {
@@ -45,7 +45,7 @@ export class Login {
   }
 
   // -----------------------------------
-  // 🔵 LOGIN CON GOOGLE
+  // LOGIN CON GOOGLE
   // -----------------------------------
   async loginGoogle() {
     try {
@@ -64,7 +64,7 @@ export class Login {
   }
 
   // -----------------------------------
-  // 🔵 REDIRECCIÓN SEGÚN ROL
+  // REDIRECCIÓN SEGÚN ROL
   // -----------------------------------
   private redirectByRole(role: string) {
     switch (role) {

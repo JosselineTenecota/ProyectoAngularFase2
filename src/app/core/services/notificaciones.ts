@@ -16,7 +16,7 @@ export class NotificacionesService {
     await addDoc(collection(this.firestore, 'notificaciones'), {
       ...notificacion,
       createdAt: new Date(), // fecha/hora de creación
-      read: false            // inicialmente no leída
+      read: false            
     });
   }
 }
