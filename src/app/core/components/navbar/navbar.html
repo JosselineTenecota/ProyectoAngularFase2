@@ -1,6 +1,6 @@
 <nav class="navbar">
-
-  <!-- HAMBURGUESA (solo móvil) -->
+  
+  <!-- HAMBURGUESA (Móvil) -->
   <div class="hamburger" (click)="toggleMenu()">
     <span></span>
     <span></span>
@@ -9,17 +9,17 @@
 
   <!-- MENÚ MÓVIL -->
   <div class="menu-mobile" [class.open]="menuOpen">
-    <a class="accion-movil" routerLink="/">Home</a>
+    <a class="accion-movil" routerLink="/" (click)="menuOpen=false">Home</a>
 
-    <a class="accion-movil" *ngIf="auth.currentRole === 'programador'" routerLink="/programador">
+    <a class="accion-movil" *ngIf="auth.currentRole === 'programador'" routerLink="/programador" (click)="menuOpen=false">
       Panel Programador
     </a>
-    
-    <a class="accion-movil" *ngIf="auth.currentRole === 'admin'" routerLink="/admin">
+
+    <a class="accion-movil" *ngIf="auth.currentRole === 'admin'" routerLink="/admin" (click)="menuOpen=false">
       Admin
     </a>
 
-    <a class="accion-movil" *ngIf="auth.currentRole === 'usuario'" routerLink="/mis-asesorias">
+    <a class="accion-movil" *ngIf="auth.currentRole === 'cliente' || auth.currentRole === 'usuario'" routerLink="/mis-asesorias" (click)="menuOpen=false">
       Mis Asesorías
     </a>
 
@@ -28,29 +28,36 @@
     </button>
   </div>
 
-  <!-- LINKS IZQUIERDA (ESCRITORIO) -->
+  <!-- LINKS IZQUIERDA (Escritorio) -->
   <div class="nav-links">
     <a routerLink="/">Home</a>
-    
-    <!-- Panel para Programador -->
-    <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">Panel Programador</a>
 
-    <!-- Panel para Admin -->
-    <a *ngIf="auth.currentRole === 'admin'" routerLink="/admin">Admin</a>
+    <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">
+      Panel Programador
+    </a>
 
-    <!-- Panel para Usuario -->
-    <a *ngIf="auth.currentRole === 'usuario'" routerLink="/mis-asesorias">Mis Asesorías</a>
+    <a *ngIf="auth.currentRole === 'admin'" routerLink="/admin">
+      Admin
+    </a>
+
+    <a *ngIf="auth.currentRole === 'cliente' || auth.currentRole === 'usuario'" routerLink="/mis-asesorias">
+      Mis Asesorías
+    </a>
   </div>
 
-  <!-- DERECHA (usuario + logout) -->
+  <!-- DERECHA (Usuario + Logout) -->
   <div class="right-section">
-    <!-- Usamos 'displayName' que es el estándar de Firebase, o 'name' si tú lo mapeaste así -->
-    <div class="user-info" *ngIf="user$ | async as user">
-      <img [src]="user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.displayName || 'U')" alt="User">
-      <span>{{ user.displayName || user.email }}</span>
+    
+    <!-- Usamos el getter currentUser del servicio -->
+    <div class="user-info" *ngIf="auth.currentUser as user">
+      
+      <!-- FOTO: Java (foto) o Firebase (photoURL) o Default -->
+      <img [src]="user.foto || user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.nombre || user.displayName || 'U')" alt="User">
+      
+      <!-- NOMBRE: Java (nombre) o Firebase (displayName/email) -->
+      <span>{{ user.nombre || user.displayName || user.email }}</span>
     </div>
 
     <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
   </div>
-
 </nav>

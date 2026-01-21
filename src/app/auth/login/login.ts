@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth';
+import { User } from '../../core/models/user';
 
 @Component({
   selector: 'app-login',
@@ -20,65 +21,48 @@ export class Login {
   private router = inject(Router);
 
   constructor() {
-    // Si ya hay sesión activa → redirigir
+    // Si ya está logueado, redirigir
     this.authService.userData$.subscribe(user => {
-      if (user && user['role']) {
-        this.redirectByRole(user['role']);
+      // Verifica si el usuario tiene rol (Java) o role (Firebase)
+      const rol = user?.rol || user?.role;
+      if (rol) {
+        this.redirectByRole(rol);
       }
     });
   }
 
-  // -----------------------------------
-  // LOGIN CON EMAIL
-  // -----------------------------------
   async loginEmail() {
     try {
-      const user = await this.authService.loginWithEmail(this.email, this.password);
+      const credenciales: User = { 
+        correo: this.email, 
+        password: this.password 
+      };
+      
+      console.log("Enviando a Java:", credenciales); // Para depurar
 
-      if (user && user['role']) {
-        this.redirectByRole(user['role']);
+      const response = await this.authService.loginWithJava(credenciales);
+      
+      if (response && response.token) {
+        console.log("Login OK");
+        // La redirección ocurre automáticamente por el constructor
       }
     } catch (error) {
-      console.error("Error login email:", error);
-      alert("Correo o contraseña incorrectos");
+      console.error("Error login:", error);
+      alert("Credenciales incorrectas o error de conexión.");
     }
   }
 
-  // -----------------------------------
-  // LOGIN CON GOOGLE
-  // -----------------------------------
-  async loginGoogle() {
-    try {
-      await this.authService.loginWithGoogle();
-
-      // Esperar los datos del usuario
-      this.authService.userData$.subscribe(user => {
-        if (user && user['role']) {
-          this.redirectByRole(user['role']);
-        }
-      });
-
-    } catch (error) {
-      console.error("Error login Google:", error);
-    }
-  }
-
-  // -----------------------------------
-  // REDIRECCIÓN SEGÚN ROL
-  // -----------------------------------
   private redirectByRole(role: string) {
-    switch (role) {
-      case 'admin':
-        this.router.navigate(['/admin']);
-        break;
-
-      case 'programador':
+    const r = role.toLowerCase(); 
+    if (r === 'programador') {
         this.router.navigate(['/programador']);
-        break;
-
-      default:
+    } else if (r === 'admin') {
+        this.router.navigate(['/admin']);
+    } else {
         this.router.navigate(['/']);
-        break;
     }
   }
+  
+  // Método vacío para el botón de Google (para que no de error el HTML)
+  loginGoogle() {}
 }

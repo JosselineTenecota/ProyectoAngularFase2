@@ -1,156 +1,99 @@
 import { Injectable, inject } from '@angular/core';
-import {
-  Auth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from '@angular/fire/auth';
-
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { LoginResponse, User } from '../models/user';
+import { firstValueFrom, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+
+// Firebase Imports
+import { Auth, signOut, onAuthStateChanged } from '@angular/fire/auth';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  private http = inject(HttpClient);
+  private auth = inject(Auth); 
+  private router = inject(Router);
 
+  private apiUrl = `${environment.apiUrl}/auth`; 
+
+  // Estado del usuario
   private userData = new BehaviorSubject<any>(null);
   userData$ = this.userData.asObservable();
 
-  // NUEVAS VARIABLES
-  currentUser: any = null;
-  currentRole: string | null = null;
+  // --- GETTER 1: Para obtener el objeto usuario completo ---
+  get currentUser() {
+    return this.userData.value;
+  }
+
+  // --- GETTER 2: (SOLUCIÓN) Para que el Navbar detecte el rol ---
+  get currentRole(): string | null {
+    const user = this.userData.value;
+    if (!user) return null;
+    
+    // Java usa 'rol', Firebase usa 'role'. Normalizamos a minúsculas.
+    const r = user.rol || user.role || '';
+    return r.toLowerCase();
+  }
 
   constructor() {
+    // Restaurar sesión al recargar página
+    onAuthStateChanged(this.auth, (firebaseUser) => {
+      const javaToken = localStorage.getItem('token');
+      const javaRol = localStorage.getItem('rol');
 
-    // Mantener sesión incluso tras recargar
-    onAuthStateChanged(this.auth, async (firebaseUser) => {
-
-      if (!firebaseUser) {
+      if (javaToken && javaRol) {
+        // Sesión Java
+        this.userData.next({ role: javaRol, rol: javaRol, token: javaToken, ...this.decodeToken(javaToken) });
+      } else if (firebaseUser) {
+        // Sesión Firebase
+        this.userData.next(firebaseUser);
+      } else {
         this.userData.next(null);
-        this.currentUser = null;
-        this.currentRole = null;
-        return;
       }
-
-      const userRef = doc(this.firestore, `users/${firebaseUser.uid}`);
-      const snap = await getDoc(userRef);
-
-      // Si NO existe en Firestore → CREARLO
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          uid: firebaseUser.uid,
-          name: firebaseUser.displayName || 'Usuario',
-          email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL || null,
-          role: 'usuario',
-          createdAt: new Date()
-        });
-      }
-
-      // Obtener datos actualizados
-      const updated = await getDoc(userRef);
-      const data = updated.data();
-
-      this.currentUser = data;
-      this.currentRole = data?.['role'] ?? null;
-
-      this.userData.next(data);
     });
   }
 
-  // -------------------------
-  // LOGIN CON GOOGLE
-  // -------------------------
-  async loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(this.auth, provider);
+  // Login Java
+  async loginWithJava(user: User): Promise<LoginResponse> {
+    return firstValueFrom(
+      this.http.post<LoginResponse>(`${this.apiUrl}/login`, user).pipe(
+        tap(res => {
+          if (res.token) {
+            localStorage.setItem('token', res.token);
+            localStorage.setItem('rol', res.rol);
+            // Guardamos ambos campos (rol y role) para compatibilidad
+            this.userData.next({ role: res.rol, rol: res.rol, token: res.token, ...this.decodeToken(res.token) });
+          }
+        })
+      )
+    );
   }
 
-  // -------------------------
-  // LOGIN CON EMAIL
-  // -------------------------
-  async loginWithEmail(email: string, password: string) {
-    const cred = await signInWithEmailAndPassword(this.auth, email, password);
-
-    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
-    const snap = await getDoc(userRef);
-
-    // Si no existe en Firestore (raro) → lo creamos
-    if (!snap.exists()) {
-      await setDoc(userRef, {
-        uid: cred.user.uid,
-        name: cred.user.email?.split('@')[0] || 'Usuario',
-        email: cred.user.email,
-        photoURL: null,
-        role: 'usuario',
-        createdAt: new Date()
-      });
-    }
-
-    const updated = await getDoc(userRef);
-    const data = updated.data();
-
-    this.currentUser = data;
-    this.currentRole = data?.['role'] ?? null;
-
-    this.userData.next(data);
-
-    return data;
+  // Utilidad para sacar datos del token (Nombre, email, etc.)
+  private decodeToken(token: string) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return { 
+        nombre: payload.nombre, // Asegúrate que en Java TokenUtils pongas "nombre"
+        cedula: payload.sub 
+      }; 
+    } catch { return {}; }
   }
 
-  // -------------------------
-  // REGISTRO CON EMAIL
-  // -------------------------
-  async registerWithEmail(email: string, password: string) {
-    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+  // Métodos de compatibilidad
+  async loginWithGoogle() {} // Implementar si lo usas
+  async loginWithEmail() {} // Implementar si lo usas
 
-    const userRef = doc(this.firestore, `users/${cred.user.uid}`);
-
-    await setDoc(userRef, {
-      uid: cred.user.uid,
-      name: email.split('@')[0],
-      email,
-      photoURL: null,
-      role: 'usuario',
-      createdAt: new Date()
-    });
-
-    const data = (await getDoc(userRef)).data();
-
-    this.currentUser = data;
-    this.currentRole = data?.['role'] ?? null;
-
-    this.userData.next(data);
-
-    return data;
-  }
-
-  // -------------------------
-  // LOGOUT (CORREGIDO)
-  //–-------------------------
   async logout() {
     try {
       await signOut(this.auth);
-
-      // Limpia estado local
-      this.userData.next(null);
-      this.currentUser = null;
-      this.currentRole = null;
       localStorage.clear();
-
-      // Navegación segura
-      const router = inject(Router);
-      router.navigate(['/login'], { replaceUrl: true });
-
+      this.userData.next(null);
+      this.router.navigate(['/login'], { replaceUrl: true });
     } catch (error) {
-      console.error('Error en logout:', error);
+      console.error('Error logout', error);
     }
   }
-
 }

@@ -1,28 +1,56 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, doc, updateDoc, query, where, getDocs } from '@angular/fire/firestore';
-import { Asesoria } from '../models/asesoria.interface';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AsesoriasService {
-  private firestore = inject(Firestore);
+  
+  private http = inject(HttpClient);
+  
+  // Conexión a WildFly: http://localhost:8080/gproyectos/api/asesorias
+  private apiUrl = `${environment.apiUrl}/asesorias`;
 
-  // Crear nueva asesoría
-  async crearAsesoria(asesoria: Asesoria) {
-    const docRef = await addDoc(collection(this.firestore, 'asesorias'), asesoria);
-    return docRef;
+  constructor() { }
+
+  // -------------------------------------------------------------------------
+  // 1. CREAR ASESORÍA (POST)
+  // Reemplaza a: addDoc(collection(...))
+  // -------------------------------------------------------------------------
+  crearAsesoria(asesoria: any): Observable<any> {
+    return this.http.post(this.apiUrl, asesoria);
   }
 
-  // Obtener asesorías pendientes de un programador
-  async getSolicitudesPendientes(programadorId: string): Promise<Asesoria[]> {
-    const ref = collection(this.firestore, 'asesorias');
-    const q = query(ref, where('programadorId', '==', programadorId), where('estado', '==', 'Pendiente'));
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Asesoria));
+  // -------------------------------------------------------------------------
+  // 2. OBTENER ASESORÍAS (GET)
+  // Reemplaza a: getDocs(query(...))
+  // -------------------------------------------------------------------------
+  // Nota: Como tu Backend Java (por ahora) devuelve TODAS las asesorías en el listar(),
+  // hacemos el filtrado aquí en el cliente (Frontend) usando RxJS 'map'.
+  getSolicitudesPendientes(programadorCedula: string): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      map(lista => lista.filter(a => 
+        // Verificamos que sea del programador y que esté pendiente
+        // (Asegúrate que Java devuelva 'programador' con 'cedula')
+        a.programador?.cedula === programadorCedula && 
+        (a.estado === 'PENDIENTE' || a.estado === 'Pendiente')
+      ))
+    );
   }
 
-  // Actualizar estado de una asesoría
-  async actualizarEstado(id: string, estado: 'Aprobada' | 'Rechazada', respuesta?: string) {
-    const docRef = doc(this.firestore, 'asesorias', id);
-    await updateDoc(docRef, { estado, respuesta: respuesta || '' });
+  // Método genérico para listar todas (útil para Admin o Cliente)
+  getAsesorias(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
+  }
+
+  // -------------------------------------------------------------------------
+  // 3. ACTUALIZAR ESTADO (PUT)
+  // Reemplaza a: updateDoc(...)
+  // -------------------------------------------------------------------------
+  // Java espera el objeto completo en el PUT.
+  // 'id' es el código numérico de la asesoría (ej. 1, 2...)
+  actualizarAsesoria(id: number, asesoriaCompleta: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, asesoriaCompleta);
   }
 }

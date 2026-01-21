@@ -1,35 +1,44 @@
 <div class="login-container">
-
   <div class="login-card">
-    <h2>Iniciar sesión</h2>
 
-    <!-- Email -->
-    <input
-      type="email"
-      placeholder="Correo electrónico"
-      [(ngModel)]="email"
-      class="input"
-    />
+    <h2>Portafolio</h2>
 
-    <!-- Password -->
-    <input
-      type="password"
-      placeholder="Contraseña"
-      [(ngModel)]="password"
-      class="input"
-    />
-
-    <button class="btn primary" (click)="loginEmail()">
-      Entrar con correo
-    </button>
-
-    <div class="separator">o</div>
-
+    <!-- Botón Google -->
     <button class="google-btn" (click)="loginGoogle()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" />
-      Continuar con Google
+      Ingresar con Google
     </button>
+
+    <!-- Separador -->
+    <div class="separator">
+      O ingresa con credenciales
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="loginEmail()">
+
+      <input
+        class="input"
+        type="email"
+        name="email"
+        placeholder="Email"
+        [(ngModel)]="email"
+        required
+      >
+
+      <input
+        class="input"
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        [(ngModel)]="password"
+        required
+      >
+
+      <button type="submit" class="btn primary">
+        Ingresar
+      </button>
+
+    </form>
 
   </div>
-
 </div>

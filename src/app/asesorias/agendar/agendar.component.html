@@ -9,18 +9,23 @@
       <!-- 1. EXPERTO -->
       <div class="form-group">
         <label>¿Con quién quieres hablar?</label>
+        
         <select [(ngModel)]="solicitud.programadorId" 
                 name="progId" 
                 required 
                 #progRef="ngModel"
                 (change)="actualizarHorariosDisponibles()" 
                 class="input-dark">
+          
           <option value="" disabled selected>Selecciona un programador</option>
-          <option *ngFor="let p of programadores" [value]="p.uid">
-            {{ p.displayName }} - {{ p.specialty }}
+          
+          <!-- CORRECCIÓN AQUÍ: Usamos las variables de JAVA -->
+          <option *ngFor="let p of programadores" [value]="p.cedula">
+            {{ p.nombre }} - {{ p.especialidad }}
           </option>
+
         </select>
-        <!-- Mensaje de error discreto -->
+
         <span *ngIf="progRef.invalid && (progRef.dirty || progRef.touched)" class="error-text">
           * Selecciona un experto
         </span>
@@ -44,7 +49,7 @@
           </span>
         </div>
         
-        <!-- 3. HORA (Filtrada por el Admin) -->
+        <!-- 3. HORA -->
         <div class="form-group">
           <label>Hora Disponible</label>
           <select [(ngModel)]="solicitud.hora" 
@@ -53,11 +58,9 @@
                   #timeRef="ngModel"
                   class="input-dark">
             
-            <!-- Mensajes de ayuda en el select -->
             <option value="" disabled selected *ngIf="!solicitud.programadorId">Primero elige experto</option>
             <option value="" disabled selected *ngIf="solicitud.programadorId">Selecciona hora</option>
             
-            <!-- Horas dinámicas -->
             <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
           </select>
           <span *ngIf="timeRef.invalid && (timeRef.dirty || timeRef.touched)" class="error-text">
