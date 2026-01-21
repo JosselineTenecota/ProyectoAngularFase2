@@ -1,0 +1,34 @@
+<nav class="navbar">
+  <div class="wrapper nav-content">
+
+    <!-- Botón hamburguesa a la izquierda -->
+    <button class="hamburger" (click)="menuOpen = !menuOpen">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">PORTAFOLIO de <span>Servicios</span></div>
+
+    <!-- Menú -->
+    <div class="menu" [class.open]="menuOpen">
+      <!-- <a routerLink="/portafolios">Portafolios</a>
+      <a routerLink="/agendar">Asesorías</a> -->
+      <a routerLink="/login" class="login-btn">Iniciar Sesión</a>
+    </div>
+
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero wrapper">
+  <h1 class="titulo">Portafolio Multi-Usuario</h1>
+
+  <p class="subtitulo">
+    Gestión profesional de proyectos, perfiles de desarrolladores y creación de asesorías personalizadas.
+  </p>
+
+  <div class="botones">
+    <button class="ui-btn primario" routerLink="/portafolios">Explorar Portafolios</button>
+    <button class="ui-btn secundario" routerLink="/agendar">Agendar Asesorías</button>
+  </div>
+</div>

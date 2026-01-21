@@ -1,0 +1,180 @@
+<div class="dash-wrapper wrapper">
+  
+  <div class="dash-header">
+    <h1>Mi Portafolio</h1>
+    <p>Bienvenido, gestiona tus proyectos académicos y laborales.</p>
+  </div>
+
+  <div class="dash-grid">
+    
+    <!-- COLUMNA 1: FORMULARIO DE CREACIÓN -->
+  
+    <div class="form-card">
+      <h2>Nuevo Proyecto</h2>
+      
+      <!-- TÍTULO (Con validación visual) -->
+      <div class="form-group">
+        <label>Título del Proyecto <span style="color:#ff5252">*</span></label>
+        <input type="text" 
+               [(ngModel)]="newProject.titulo" 
+               [class.input-error]="submitted && !newProject.titulo"
+               placeholder="Ej: Sistema de Ventas" 
+               class="input-dark">
+        <small class="error-msg" *ngIf="submitted && !newProject.titulo">Obligatorio</small>
+      </div>
+
+      <!-- TIPO PROYECTO -->
+      <div class="form-group">
+        <label>Tipo de Proyecto</label>
+        <select [(ngModel)]="newProject.tipo" class="input-dark">
+          <option value="Academico">Académico</option>
+          <option value="Laboral">Laboral</option>
+        </select>
+      </div>
+
+      <!-- TIPO PARTICIPACIÓN -->
+      <div class="form-group">
+        <label>Tipo de Participación</label>
+        <select [(ngModel)]="newProject.participacion" class="input-dark">
+          <option value="Frontend">Frontend</option>
+          <option value="Backend">Backend</option>
+          <option value="Base de Datos">Base de Datos</option>
+        </select>
+      </div>
+
+      <!-- TECNOLOGÍAS -->
+      <div class="form-group">
+        <label>Tecnologías</label>
+        <input type="text" [(ngModel)]="newProject.tecnologias" placeholder="Angular, Firebase..." class="input-dark">
+      </div>
+
+      <!-- DESCRIPCIÓN (Con validación visual) -->
+      <div class="form-group">
+        <label>Descripción <span style="color:#ff5252">*</span></label>
+        <textarea [(ngModel)]="newProject.descripcion" 
+                  [class.input-error]="submitted && !newProject.descripcion"
+                  rows="4" 
+                  class="input-dark"></textarea>
+        <small class="error-msg" *ngIf="submitted && !newProject.descripcion">Obligatorio</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>URL Repositorio</label>
+          <input type="text" [(ngModel)]="newProject.repoUrl" class="input-dark">
+        </div>
+        <div class="form-group">
+          <label>URL Demo</label>
+          <input type="text" [(ngModel)]="newProject.demoUrl" class="input-dark">
+        </div>
+      </div>
+
+      <button class="btn-submit" (click)="addProject()">Publicar Proyecto</button>
+    </div>
+
+    <!-- COLUMNA 2: LISTAS SEPARADAS (ACADÉMICOS / LABORALES) -->
+
+    <div class="projects-list">
+      
+      <!-- SECCIÓN 1: ACADÉMICOS -->
+      <div class="section-block">
+        <h2 class="section-title">🎓 Proyectos Académicos</h2>
+        
+        <!-- Usamos academicos$ en lugar de projects$ -->
+        <div class="project-card" *ngFor="let p of academicos$ | async">
+          <div class="card-header">
+            <div>
+              <span class="badge">Académico</span>
+              <span class="part-badge">{{ p.participacion }}</span>
+            </div>
+            <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
+          </div>
+          
+          <h3>{{ p.titulo }}</h3>
+          <p class="tech">{{ p.tecnologias }}</p>
+          <p class="desc">{{ p.descripcion }}</p>
+          
+          <div class="links">
+            <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">Código</a>
+            <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">Demo</a>
+          </div>
+        </div>
+
+        <div *ngIf="(academicos$ | async)?.length === 0" class="empty-mini">
+          No hay proyectos académicos.
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- SECCIÓN 2: LABORALES -->
+      <div class="section-block">
+        <h2 class="section-title">💼 Proyectos Laborales</h2>
+
+        <!-- Usamos laborales$ en lugar de projects$ -->
+        <div class="project-card" *ngFor="let p of laborales$ | async">
+          <div class="card-header">
+            <div>
+              <span class="badge work">Laboral</span>
+              <span class="part-badge">{{ p.participacion }}</span>
+            </div>
+            <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
+          </div>
+          
+          <h3>{{ p.titulo }}</h3>
+          <p class="tech">{{ p.tecnologias }}</p>
+          <p class="desc">{{ p.descripcion }}</p>
+          
+          <div class="links">
+            <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">Código</a>
+            <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">Demo</a>
+          </div>
+        </div>
+
+        <div *ngIf="(laborales$ | async)?.length === 0" class="empty-mini">
+          No hay proyectos laborales.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SECCIÓN DE ASESORÍAS -->
+
+  <div class="appointments-section">
+    <h2>Solicitudes de Asesoría Recibidas</h2>
+    
+    <div class="appointments-grid">
+      <div class="appt-card" *ngFor="let cita of asesorias$ | async" [ngClass]="cita.estado.toLowerCase()">
+        
+        <div class="appt-header">
+          <span class="status-badge" [ngClass]="cita.estado.toLowerCase()">{{ cita.estado }}</span>
+          <span class="date">{{ cita.fecha }} | {{ cita.hora }}</span>
+        </div>
+
+        <h3>{{ cita.clienteNombre }}</h3>
+        <span class="email-client">{{ cita.clienteEmail }}</span>
+        
+        <div class="topic-box">
+          <strong>Tema:</strong> {{ cita.tema }}
+        </div>
+
+        <div class="answer-box" *ngIf="cita.respuesta">
+          <strong>Tu respuesta:</strong> {{ cita.respuesta }}
+        </div>
+
+        <div class="actions" *ngIf="cita.estado === 'Pendiente'">
+          <button class="btn-action approve" (click)="responderAsesoria(cita, 'Aprobada')">Aprobar</button>
+          <button class="btn-action reject" (click)="responderAsesoria(cita, 'Rechazada')">Rechazar</button>
+        </div>
+
+      </div>
+
+      <div *ngIf="(asesorias$ | async)?.length === 0" class="empty-state-appt">
+        No tienes solicitudes pendientes.
+      </div>
+    </div>
+  </div>
+
+</div>

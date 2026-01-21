@@ -1,0 +1,126 @@
+/* --- NAVBAR GENERAL --- */
+.navbar {
+  width: 100%;
+  height: 70px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  gap: 20px;
+  position: relative; 
+  box-sizing: border-box;   
+}
+
+.accion-movil
+{
+  color: white;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+/* --- LINKS IZQUIERDA (desktop) --- */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  flex-grow: 1;
+}
+
+.nav-links a {
+  color: white;
+  font-size: 1.1rem;
+  text-decoration: none;
+  
+}
+
+/* --- SECCIÓN DERECHA --- */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: auto;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-info span {
+  color: white;
+  font-size: 1rem;
+}
+
+/* --- BOTÓN LOGOUT --- */
+.logout-btn {
+  background: #4df788;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* --- HAMBURGUESA (solo móvil) --- */
+.hamburger {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hamburger span {
+  background: white;
+  width: 28px;
+  height: 3px;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+/* --- MENÚ MÓVIL (oculto por defecto) --- */
+.menu-mobile {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: #181818;
+  
+  padding: 20px;
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.menu-mobile.open {
+  display: flex;
+  
+  align-items: center ;
+}
+
+/*        RESPONSIVE (móvil)       */
+
+@media (max-width: 900px) {
+
+  /* mostrar hamburguesa */
+  .hamburger {
+    display: flex;
+  }
+
+  /* ocultar links de escritorio */
+  .nav-links {
+    display: none;
+  }
+
+  /* ajustar right-section */
+  .right-section {
+    margin-left: auto;
+    gap: 10px;
+  }
+}

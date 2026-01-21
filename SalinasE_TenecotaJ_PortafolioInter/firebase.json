@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "dist/SalinasE_TenecotaJ_PortafolioInter/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

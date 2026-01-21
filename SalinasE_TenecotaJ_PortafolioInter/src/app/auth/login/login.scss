@@ -1,0 +1,159 @@
+// 🎨 PALETA DE COLORES
+$bg-color: #0a0a0a;
+$card-bg: #111;
+$primary: #6a5acd;
+$primary-hover: #8a7df0;
+$google-btn-bg: #222;
+$input-bg: #1a1a1a;
+$input-border: #333;
+$text-color: #e4e4e4;
+$neon: #7b5bff;
+$neon-strong: #b49dff;
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $bg-color;
+  padding: 20px 25px;
+}
+
+.login-card {
+  background: $card-bg;
+  padding: 40px 60px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px; 
+  text-align: center;
+  border: 1px solid #222;
+  transition: 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.04);
+
+  &:hover {
+    box-shadow:
+      0 0 10px $neon,
+      0 0 20px $neon,
+      0 0 40px $neon-strong;
+    transform: scale(1.02);
+  }
+}
+
+// TÍTULO
+h2 {
+  color: $text-color;
+  margin-bottom: 30px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+
+.input,
+.btn,
+.google-btn {
+  width: 100%;
+  box-sizing: border-box;  
+  display: block;
+}
+
+
+.input {
+  padding: 16px 22px;  
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: $input-bg;
+  border: 1px solid $input-border;
+  color: $text-color;
+  font-size: 16px;
+  transition: 0.3s ease;
+
+  &::placeholder {
+    color: #aaa;
+  }
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 10px $primary;
+  }
+
+  &:hover {
+    border-color: $neon;
+    box-shadow: 0 0 8px $neon;
+  }
+}
+
+.btn {
+  padding: 14px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  margin-top: 10px;
+  transition: 0.3s ease;
+
+  &.primary {
+    background: $primary;
+
+    &:hover {
+      background: $primary-hover;
+      box-shadow:
+        0 0 10px $primary,
+        0 0 20px $primary;
+      transform: scale(1.03);
+    }
+  }
+}
+
+// BOTÓN GOOGLE
+.google-btn {
+  padding: 14px 22px;
+  border-radius: 10px;
+  background: $google-btn-bg;
+  border: 1px solid #333;
+  color: $text-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: 0.3s ease;
+  font-size: 16px;
+  font-weight: 500;
+
+  img {
+    width: 20px;
+  }
+
+  &:hover {
+    border-color: $neon;
+    box-shadow: 0 0 12px $neon;
+    transform: scale(1.03);
+  }
+}
+
+// SEPARADOR
+.separator {
+  margin: 20px 0;
+  color: #777;
+  font-size: 16px;
+}
+
+// RESPONSIVE
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 25px;
+    max-width: 92%;
+  }
+
+  .input {
+    padding: 15px 20px;
+  }
+
+  .btn,
+  .google-btn {
+    padding: 14px 20px;
+  }
+}

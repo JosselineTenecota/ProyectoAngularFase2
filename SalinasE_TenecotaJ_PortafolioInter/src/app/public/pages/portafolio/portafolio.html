@@ -1,0 +1,59 @@
+<p>portafolio works!</p>
+<div class="portfolio-container wrapper" *ngIf="programmer; else loadingTpl">
+  
+  <!-- Encabezado del Perfil -->
+  <header class="profile-header">
+    <img [src]="programmer.photoURL || 'https://ui-avatars.com/api/?name='+programmer.displayName" class="profile-img">
+    
+    <div class="profile-info">
+      <span class="badge">{{ programmer.specialty || 'Programador' }}</span>
+      <h1>{{ programmer.displayName }}</h1>
+      <p class="bio">{{ programmer.description }}</p>
+      
+      <div class="contact-actions">
+        <a href="mailto:{{programmer.email}}" class="btn-contact">Contactar</a>
+        <!-- Aquí podrías poner botón de agendar asesoría más adelante -->
+      </div>
+    </div>
+  </header>
+
+  <hr class="divider">
+
+  <!-- Sección de Proyectos -->
+  <section class="projects-section">
+    <h2>Proyectos Realizados</h2>
+    
+    <div class="projects-grid">
+      <div class="project-card" *ngFor="let p of projects$ | async">
+        <div class="card-top">
+          <span class="type-badge" [class.laboral]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
+        </div>
+        
+        <h3>{{ p.titulo }}</h3>
+        <p class="tech-stack">{{ p.tecnologias }}</p>
+        <p class="description">{{ p.descripcion }}</p>
+        
+        <div class="card-links">
+          <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank" class="link-btn code">
+             Código
+          </a>
+          <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank" class="link-btn demo">
+             Ver Demo
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Si no hay proyectos -->
+    <div *ngIf="(projects$ | async)?.length === 0" class="empty-state">
+      <p>Este programador aún no ha publicado proyectos.</p>
+    </div>
+  </section>
+
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-screen">
+    <p>Cargando perfil...</p>
+  </div>
+</ng-template>

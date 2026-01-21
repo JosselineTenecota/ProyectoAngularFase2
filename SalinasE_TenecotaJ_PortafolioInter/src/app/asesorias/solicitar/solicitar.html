@@ -1,0 +1,41 @@
+<div class="history-wrapper wrapper">
+  <div class="history-container">
+    <h1>Mis Solicitudes de Asesoría</h1>
+    <p>Revisa el estado de tus peticiones a los expertos.</p>
+
+    <!-- Lista vacía -->
+    <div *ngIf="(misSolicitudes$ | async)?.length === 0" class="empty-state">
+      <p>No tienes solicitudes realizadas.</p>
+      <a routerLink="/agendar" class="btn-link">Agendar mi primera cita</a>
+    </div>
+
+    <!-- Lista de Tarjetas -->
+    <div class="req-grid">
+      <div class="req-card" *ngFor="let req of misSolicitudes$ | async" [ngClass]="req.estado.toLowerCase()">
+        
+        <div class="req-header">
+          <span class="prog-name">Experto: {{ req.programadorNombre }}</span>
+          <!-- SOLO TEXTO, SIN BOTONES -->
+          <span class="status-badge" [ngClass]="req.estado.toLowerCase()">
+            {{ req.estado }}
+          </span>
+        </div>
+        
+        <div class="req-body">
+          <div class="req-time">📅 {{ req.fecha }} <br> 🕒 {{ req.hora }}</div>
+          <p class="req-topic">"{{ req.tema }}"</p>
+          
+          <!-- RESPUESTA DEL PROGRAMADOR -->
+          <div class="req-response" *ngIf="req.respuesta">
+            <strong>Respuesta:</strong> {{ req.respuesta }}
+          </div>
+          <div class="req-response" *ngIf="!req.respuesta && req.estado === 'Pendiente'">
+            <em>Esperando respuesta...</em>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

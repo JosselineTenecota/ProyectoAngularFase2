@@ -1,0 +1,81 @@
+.admin-wrapper {
+  padding-top: 120px;
+  padding-bottom: 50px;
+  color: #e3e3e3;
+}
+
+.admin-header-flex {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+  .header-text h1 { font-size: 2rem; margin: 0 0 10px 0; }
+}
+
+.table-container {
+  background: #161616; border-radius: 12px; padding: 20px; 
+  border: 1px solid rgba(255,255,255,0.05); overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 1000px; /* Asegura que no se aplaste */ }
+th { text-align: left; padding: 15px; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; font-size: 0.9rem; }
+
+.user-info {
+  display: flex; align-items: center; gap: 10px;
+  .avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; }
+  .name { font-weight: 600; color: #fff; white-space: nowrap; }
+  .email { font-size: 0.8rem; color: #666; }
+}
+
+.role-badge {
+  padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  &.admin { background: rgba(255, 82, 82, 0.15); color: #ff5252; }
+  &.programador { background: rgba(66, 165, 245, 0.15); color: #42a5f5; }
+  &.usuario { background: rgba(255, 255, 255, 0.1); color: #aaa; }
+}
+
+.time-badge {
+  background: rgba(255, 202, 40, 0.1); border: 1px solid rgba(255, 202, 40, 0.2); color: #ffca28;
+  padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; white-space: nowrap;
+}
+
+.na-text { color: #444; font-size: 0.8rem; font-style: italic; }
+
+
+.link-text {
+  color: #42a5f5; text-decoration: none; font-size: 0.85rem;
+  display: block;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  &:hover { text-decoration: underline; color: #fff; }
+}
+
+.btn-icon {
+  background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-right: 5px;
+  color: #888; /* Color base */
+  
+  &.edit { 
+    color: #ffca28; /* Amarillo */
+    &:hover { color: #ffe082; transform: scale(1.2); }
+  }
+  
+  &.delete { 
+    color: #ef5350; /* Rojo */
+    &:hover { color: #ff8a80; transform: scale(1.2); }
+  }
+}
+
+.btn-save { background: #42a5f5; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+.btn-cancel { background: #424242; color: white; border: none; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+.btn-create { background: #66bb6a; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+.input-dark {
+  background: #252525; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 0.9rem;
+  &:focus { outline: none; border-color: #42a5f5; }
+}
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #1a1a1a; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; h2 { margin-top: 0; color: #fff; } }
+.form-group { margin-bottom: 15px; label { display: block; color: #aaa; margin-bottom: 5px; } }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }

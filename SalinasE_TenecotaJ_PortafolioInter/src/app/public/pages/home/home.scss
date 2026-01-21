@@ -1,0 +1,213 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: #e3e3e3;
+  background: #0d0d0d;
+  padding: 0;
+  margin: 0;
+
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 40, 40, 0.15), transparent 70%),
+    radial-gradient(circle at 80% 60%, rgba(255, 200, 50, 0.12), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 80px);
+
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ---------------- NAVBAR ---------------- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  z-index: 100;
+}
+
+.nav-content {
+  height: 80px;
+  display: flex;
+  justify-content: flex-start; /* IMPORTANTE PARA ALINEAR A LA IZQUIERDA */
+  align-items: center;
+  gap: 20px; /* Espaciado entre hamburguesa y logo */
+}
+
+.logo {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.logo span { color: #ff5252; }
+
+.menu {
+  margin-left: auto; /* Mueve el menú hacia la derecha */
+  display: flex;
+  align-items: center;
+  transition: .3s ease;
+}
+
+.menu a {
+  margin-left: 30px;
+  text-decoration: none;
+  color: #e3e3e3;
+  font-size: 1.05rem;
+  transition: .3s ease;
+}
+.menu a:hover { color: #ffb300; }
+
+.login-btn {
+  border: 2px solid #ffb300;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+/* HERO */
+.hero {
+  padding-top: 180px;
+  text-align: center;
+}
+
+.titulo{
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1.5px;
+  margin-bottom: 30px;
+}
+
+.subtitulo {
+  margin-top: 20px;
+  font-size: 1.25rem;
+  opacity: .85;
+  margin-bottom: 50px;
+}
+
+.botones {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.ui-btn {
+  width: 260px;
+  height: 58px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: #1a1a1a;
+  color: #dedede;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: .2s ease;
+}
+
+.ui-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 10px 25px rgba(255,255,255,0.08);
+}
+
+.primario { border-color: #42a5f5; color: #42a5f5; }
+.secundario { border-color: #66bb6a; color: #66bb6a; }
+
+/* ---------------- HAMBURGUESA ---------------- */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  width: 28px;
+  height: 22px;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.hamburger span {
+  height: 3px;
+  width: 100%;
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* ---------------- MÓVIL ---------------- */
+@media (max-width: 768px) {
+
+  .wrapper { padding: 0 20px; }
+
+  .logo { font-size: 1.4rem; }
+
+  .titulo { 
+    font-size: 2.3rem;
+    padding: 0 5px;
+  }
+  .subtitulo { 
+    font-size: 1.1rem;
+    line-height: 1.5;
+    padding: 0 5px;
+
+  }
+
+  /* Mostrar hamburguesa */
+  .hamburger {
+    display: flex;
+  }
+
+  /* Menú móvil */
+  .menu {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.90);
+    flex-direction: column;
+    padding: 20px 0;
+    display: none;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-left: 0;
+  }
+
+  .menu.open {
+    display: flex;
+  }
+
+  .menu a {
+    margin: 15px 0;
+    font-size: 1.1rem;
+  }
+
+  .login-btn {
+    width: 140px;
+    margin: 0 auto !important;
+    display: inline-block !important;
+  }
+
+  .hero {
+    padding-top: 140px;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 95%;
+    margin: 0 auto;
+
+  }
+}

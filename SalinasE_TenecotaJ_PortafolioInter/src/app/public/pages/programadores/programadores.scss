@@ -1,0 +1,96 @@
+/* CONTENEDOR GENERAL RESPONSIVE */
+.programmers-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* --- CARD STYLE --- */
+.card-client {
+  background: #2b1540; 
+  width: 14rem;
+  padding: 25px 20px;
+  border: 3px solid #7b2cbf; 
+  box-shadow: 0 6px 15px rgba(123, 44, 191, 0.35); 
+  border-radius: 14px;
+  text-align: center;
+  color: #f2e9fe;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease;
+}
+
+.card-client:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(157, 78, 221, 0.45);
+}
+
+/* FOTO */
+.user-picture {
+  overflow: hidden;
+  width: 5rem;
+  height: 5rem;
+  border: 3px solid #9d4edd; 
+  border-radius: 999px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.user-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* NOMBRE */
+.name-client {
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 18px;
+  color: #e9d5ff;
+}
+
+.name-client span {
+  display: block;
+  font-weight: 300;
+  font-size: 14px;
+  opacity: 0.85;
+  color: #d8b4fe;
+}
+
+/* DIVISOR */
+.divider {
+  width: 70%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 15px auto;
+}
+
+/* BOTÓN PROYECTOS */
+.btn-proyectos {
+  margin-top: 15px;
+  padding: 10px 22px;
+  width: 100%;
+  background: #6a1b9a; 
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-proyectos:hover {
+  background: #4a1470; 
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 480px) {
+  .card-client {
+    width: 90%;
+    padding: 22px 18px;
+  }
+}

@@ -1,0 +1,49 @@
+.history-wrapper {
+  padding-top: 120px;
+  padding-bottom: 60px;
+  min-height: 80vh;
+}
+
+.history-container {
+  max-width: 800px;
+  margin: 0 auto;
+  h1 { color: #fff; margin-bottom: 10px; text-align: center; }
+  p { color: #888; text-align: center; margin-bottom: 40px; }
+}
+
+.req-grid { display: flex; flex-direction: column; gap: 20px; }
+
+.req-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-left: 5px solid #444;
+
+  &.pendiente { border-left-color: #ffb300; }
+  &.aprobada { border-left-color: #66bb6a; }
+  &.rechazada { border-left-color: #ff5252; }
+}
+
+.req-header {
+  display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+}
+.prog-name { color: #fff; font-weight: 600; }
+
+.status-badge {
+  font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 700;
+  &.pendiente { background: rgba(255, 179, 0, 0.15); color: #ffb300; }
+  &.aprobada { background: rgba(102, 187, 106, 0.15); color: #66bb6a; }
+  &.rechazada { background: rgba(255, 82, 82, 0.15); color: #ff5252; }
+}
+
+.req-time { color: #aaa; margin-bottom: 10px; font-family: monospace; }
+.req-topic { color: #ccc; font-style: italic; }
+
+.req-response {
+  margin-top: 15px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; color: #ddd; font-size: 0.9rem;
+  strong { color: #66bb6a; }
+}
+
+.empty-state { text-align: center; color: #666; margin-top: 40px; }
+.btn-link { color: #42a5f5; text-decoration: none; font-weight: 600; cursor: pointer; }
