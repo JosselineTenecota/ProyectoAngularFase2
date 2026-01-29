@@ -10,4 +10,5 @@ export interface Asesoria {
   tema: string;           // Motivo de la consulta
   estado: 'Pendiente' | 'Aprobada' | 'Rechazada';
   respuesta?: string;     // Mensaje opcional del programador
+  //comentario de prueba
 }
