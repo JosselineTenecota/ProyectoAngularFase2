@@ -6,9 +6,9 @@ import { Injectable } from "@angular/core";
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
 
-  private api = 'http://localhost:8080/tuApp/api/usuarios';
+  private api = 'http://localhost:8080/gproyectos/api/usuarios';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   registrar(dto: RegistroDTO) {
     return this.http.post<any>(`${this.api}/crear`, dto);
@@ -19,14 +19,16 @@ export class UsuariosService {
   }
 
   buscarPorCorreo(correo: string) {
-    return this.http.get<Usuario>(`${this.api}/${correo}`);
+    return this.http.get<Usuario>(`${this.api}/${encodeURIComponent(correo)}`);
   }
+
 
   actualizar(usuario: Partial<Usuario> & { correo: string; password?: string }) {
     return this.http.put<any>(this.api, usuario);
   }
 
   eliminar(correo: string) {
-    return this.http.delete<any>(`${this.api}/${correo}`);
+    return this.http.delete<any>(`${this.api}/${encodeURIComponent(correo)}`);
   }
+
 }
