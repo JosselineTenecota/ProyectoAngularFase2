@@ -11,8 +11,11 @@ export class UsuariosService {
   private api = 'http://localhost:8080/gproyectos/api/usuarios';
 
   // Obtener todos los usuarios (GET /api/usuarios)
-  listar(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.api);
+  // Cambia el método listar para probar si la ruta es diferente
+  listar(): Observable<any[]> {
+    // Prueba si tu backend tiene una ruta específica como /todos o /listar
+    // Si no la tiene, asegúrate de que en Java el @GET no tenga @Path o sea @Path("/")
+    return this.http.get<any[]>(this.api);
   }
 
   // Crear usuario (POST /api/usuarios/crear)

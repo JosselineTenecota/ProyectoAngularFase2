@@ -2,7 +2,7 @@
   <div class="admin-header-flex">
     <div class="header-text">
       <h1>Gestión de Usuarios</h1>
-      <p>Base de Datos: PostgreSQL</p>
+      <p>Servidor: <strong>WildFly / PostgreSQL</strong></p>
     </div>
     <button class="btn-create" (click)="toggleCreateModal()">+ Nuevo Usuario</button>
   </div>
@@ -12,29 +12,27 @@
       <thead>
         <tr>
           <th>Cédula</th>
-          <th>Usuario</th>
+          <th>Perfil / Correo</th>
           <th>Rol</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of users$ | async">
-
+          
           <ng-container *ngIf="editingId !== user.correo">
-            <td>{{ user.persona?.['cedula'] || user.persona?.['per_cedula'] || '---' }}</td>
+            <td>{{ user.persona?.cedula || user.persona?.per_cedula || '---' }}</td>
             <td>
               <div class="user-info">
-                <img
-                  [src]="'https://ui-avatars.com/api/?name=' + (user.persona?.['nombre'] || user.persona?.['per_nombre'] || 'U')"
-                  class="avatar">
+                <img [src]="'https://ui-avatars.com/api/?name=' + (user.persona?.nombre || user.persona?.per_nombre || 'U')" class="avatar">
                 <div>
-                  <div class="name">{{ user.persona?.['nombre'] || user.persona?.['per_nombre'] || 'Sin Nombre' }}</div>
+                  <div class="name">{{ user.persona?.nombre || user.persona?.per_nombre || 'Sin Nombre' }}</div>
                   <div class="email">{{ user.correo }}</div>
                 </div>
               </div>
             </td>
             <td>
-              <span class="role-badge" [ngClass]="user.rol ? user.rol.toLowerCase() : ''">
+              <span class="role-badge" [ngClass]="user.rol?.toLowerCase()">
                 {{ user.rol }}
               </span>
             </td>
@@ -46,11 +44,10 @@
 
           <ng-container *ngIf="editingId === user.correo">
             <td>
-              <input type="text" [ngModel]="user.persona?.['cedula'] || user.persona?.['per_cedula']" class="input-dark"
-                disabled>
+              <input type="text" [ngModel]="user.persona?.cedula || user.persona?.per_cedula" class="input-dark" disabled>
             </td>
             <td>
-              <input type="text" [(ngModel)]="editForm.nombre" class="input-dark">
+              <input type="text" [(ngModel)]="editForm.nombre" class="input-dark" placeholder="Nombre completo">
             </td>
             <td>
               <select [(ngModel)]="editForm.rol" class="input-dark">
@@ -60,7 +57,7 @@
               </select>
             </td>
             <td>
-              <button class="btn-save" (click)="saveUser()">OK</button>
+              <button class="btn-save" (click)="saveUser()">Guardar</button>
               <button class="btn-cancel" (click)="cancelEdit()">X</button>
             </td>
           </ng-container>
@@ -73,7 +70,7 @@
 
 <div class="modal-overlay" *ngIf="showCreateModal">
   <div class="modal-content">
-    <h2>Nuevo Usuario en PostgreSQL</h2>
+    <h2>Registrar Nuevo Usuario</h2>
     <div class="form-group">
       <label>Cédula</label>
       <input type="text" [(ngModel)]="newUser.cedula" class="input-dark">
@@ -96,7 +93,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" (click)="toggleCreateModal()">Cancelar</button>
-      <button class="btn-save" (click)="createUser()">Registrar</button>
+      <button class="btn-save" (click)="createUser()">Registrar en DB</button>
     </div>
   </div>
 </div>
