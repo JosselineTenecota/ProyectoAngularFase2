@@ -1,31 +1,33 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { map, take } from 'rxjs/operators'; // Agregamos 'take'
+import { map, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth';
 
 export const authGuard: CanActivateFn = () => {
-
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // 1. REGLA MAESTRA (FASE 2):
-  // Si existe un token en el navegador, el usuario YA inició sesión con Java.
-  // Lo dejamos pasar inmediatamente sin esperar nada más.
-  if (typeof localStorage !== 'undefined' && localStorage.getItem('token')) {
-    return true;
+  // 1. Verificación rápida por Token o Rol en localStorage
+  if (typeof localStorage !== 'undefined') {
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('rol');
+
+    // Si tenemos evidencia de sesión local, permitimos el paso inicial
+    if (token || rol) {
+      return true;
+    }
   }
 
-  // 2. REGLA SECUNDARIA (FASE 1 - Firebase):
-  // Si no hay token, miramos si hay sesión de Google activa.
+  // 2. Verificación por estado de Firebase/AuthService
   return authService.userData$.pipe(
-    take(1), // Importante: Tomar solo 1 valor y cerrar para que el Guard no se quede colgado
+    take(1),
     map(user => {
       if (user) {
         return true;
       }
-      
-      // Si no hay Token ni Usuario Firebase -> Pa' fuera
-      router.navigate(['/login']); 
+
+      console.warn('AuthGuard: Usuario no autenticado, redirigiendo a login');
+      router.navigate(['/login']);
       return false;
     })
   );

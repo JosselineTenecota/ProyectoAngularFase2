@@ -13,56 +13,53 @@ import { User } from '../../core/models/user';
   styleUrls: ['./login.scss']
 })
 export class Login {
-
   email: string = '';
   password: string = '';
 
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  constructor() {
-    // Si ya está logueado, redirigir
-    this.authService.userData$.subscribe(user => {
-      // Verifica si el usuario tiene rol (Java) o role (Firebase)
-      const rol = user?.rol || user?.role;
-      if (rol) {
-        this.redirectByRole(rol);
+  // Redirección centralizada
+  private redirectByRole(rol: string) {
+    if (!rol) return;
+    
+    const roleLower = rol.toLowerCase().trim();
+    
+    if (roleLower === 'admin') {
+      console.log('Redirigiendo a Dashboard de Admin...');
+      this.router.navigate(['/admin']);
+    } else if (roleLower === 'programador' || roleLower === 'usuario') {
+      console.log('Redirigiendo a Vista de Programador...');
+      this.router.navigate(['/programador']);
+    } else {
+      console.log('Rol no reconocido, enviando a inicio');
+      this.router.navigate(['/inicio']);
+    }
+  }
+
+  async loginGoogle() {
+    try {
+      const userRes = await this.authService.loginWithGoogle();
+      
+      if (userRes && userRes.rol) {
+        // Forzamos la redirección inmediata tras el éxito
+        this.redirectByRole(userRes.rol);
       }
-    });
+    } catch (error) {
+      console.error('Error en el componente login:', error);
+      alert("El usuario no existe en la base de datos local.");
+    }
   }
 
   async loginEmail() {
     try {
-      const credenciales: User = { 
-        correo: this.email, 
-        password: this.password 
-      };
-      
-      console.log("Enviando a Java:", credenciales); // Para depurar
-
-      const response = await this.authService.loginWithJava(credenciales);
-      
-      if (response && response.token) {
-        console.log("Login OK");
-        // La redirección ocurre automáticamente por el constructor
+      const credenciales: User = { correo: this.email, password: this.password };
+      const user = await this.authService.loginWithJava(credenciales);
+      if (user && user.rol) {
+        this.redirectByRole(user.rol);
       }
     } catch (error) {
-      console.error("Error login:", error);
-      alert("Credenciales incorrectas o error de conexión.");
+      alert("Credenciales incorrectas.");
     }
   }
-
-  private redirectByRole(role: string) {
-    const r = role.toLowerCase(); 
-    if (r === 'programador') {
-        this.router.navigate(['/programador']);
-    } else if (r === 'admin') {
-        this.router.navigate(['/admin']);
-    } else {
-        this.router.navigate(['/']);
-    }
-  }
-  
-  // Método vacío para el botón de Google (para que no de error el HTML)
-  loginGoogle() {}
 }

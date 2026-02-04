@@ -28,46 +28,46 @@ export const routes: Routes = [
   {
     path: 'agendar',
     loadComponent: () =>
-      
       import('./asesorias/agendar/agendar.component').then(m => m.AgendarComponent),
   },
 
-  // --- RUTAS PROTEGIDAS ---
+  // --- RUTAS PROTEGIDAS (ADMIN) ---
   {
     path: 'admin',
-    canActivate: [authGuard, adminGuard],
+    // Si la redirección falla, comenta canActivate temporalmente para probar
+    canActivate: [authGuard, adminGuard], 
     loadComponent: () =>
       import('./admin/admin-dashboard/admin-dashboard')
         .then(m => m.AdminDashboard),
   },
+
+  // --- RUTAS PROTEGIDAS (PROGRAMADOR) ---
   {
     path: 'programador',
     canActivate: [authGuard, programadorGuard],
-    loadComponent: () =>
-      import('./programador/dashboard/dashboard')
-        .then(m => m.Dashboard),
+    children: [
+      {
+        path: '', // Esta es la ruta /programador
+        loadComponent: () => import('./programador/dashboard/dashboard').then(m => m.Dashboard),
+      },
+      {
+        path: 'solicitudes', // Esta es la ruta /programador/solicitudes
+        loadComponent: () => import('./asesorias/solicitar/solicitar').then(m => m.Solicitar)
+      }
+    ]
   },
 
-  {
-    path: 'programador/solicitudes',
-    loadComponent: () =>
-      import('./asesorias/solicitar/solicitar').then(m => m.Solicitar)
-  },
-
+  // --- OTRAS RUTAS DE GESTIÓN ---
   {
     path: 'portafolio/:id/proyectos',
     loadComponent: () =>
       import('./programador/mis-proyectos/mis-proyectos').then(m => m.MisProyectos),
   },
-
-  // En app.routes.ts
   {
     path: 'mis-asesorias',
     loadComponent: () => import('./asesorias/solicitar/solicitar').then(m => m.Solicitar),
   },
 
-
   // --- COMODÍN (SIEMPRE AL FINAL) ---
-  { path: '**', pathMatch: 'full', redirectTo: '' },
-
+  { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

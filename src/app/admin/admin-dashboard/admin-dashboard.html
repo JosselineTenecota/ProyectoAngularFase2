@@ -1,8 +1,8 @@
 <div class="admin-wrapper wrapper">
   <div class="admin-header-flex">
     <div class="header-text">
-      <h1>Panel de Administración</h1>
-      <p>Gestiona usuarios, horarios y enlaces de contacto.</p>
+      <h1>Gestión de Usuarios</h1>
+      <p>Base de Datos: PostgreSQL</p>
     </div>
     <button class="btn-create" (click)="toggleCreateModal()">+ Nuevo Usuario</button>
   </div>
@@ -11,110 +11,54 @@
     <table>
       <thead>
         <tr>
+          <th>Cédula</th>
           <th>Usuario</th>
           <th>Rol</th>
-          <th>Especialidad</th>
-          <th>Rango Horario</th>
-          <th>Contacto</th>
-          <th>Redes</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of users$ | async">
-          
-          <!-- ================= Verificacion de Comentarios MODO VISTA (Lectura) ================= -->
-          <ng-container *ngIf="editingId !== user.uid">
+
+          <ng-container *ngIf="editingId !== user.correo">
+            <td>{{ user.persona?.['cedula'] || user.persona?.['per_cedula'] || '---' }}</td>
             <td>
               <div class="user-info">
-                <img [src]="user.photoURL || 'https://ui-avatars.com/api/?name='+(user.displayName||user.email)" class="avatar">
+                <img
+                  [src]="'https://ui-avatars.com/api/?name=' + (user.persona?.['nombre'] || user.persona?.['per_nombre'] || 'U')"
+                  class="avatar">
                 <div>
-                  <div class="name">{{ user.displayName || 'Sin Nombre' }}</div>
-                  <div class="email">{{ user.email }}</div>
+                  <div class="name">{{ user.persona?.['nombre'] || user.persona?.['per_nombre'] || 'Sin Nombre' }}</div>
+                  <div class="email">{{ user.correo }}</div>
                 </div>
               </div>
             </td>
-            
-            <td><span class="role-badge" [ngClass]="user.role">{{ user.role }}</span></td>
-            
-            <td>{{ user.specialty || '---' }}</td>
-            
-            <!-- Rango Horario -->
             <td>
-              <span *ngIf="user.role === 'programador'" class="time-badge">
-                {{ user.horaInicio || '08:00' }} - {{ user.horaFin || '17:00' }}
+              <span class="role-badge" [ngClass]="user.rol ? user.rol.toLowerCase() : ''">
+                {{ user.rol }}
               </span>
-              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
             </td>
-
-            <!-- Contacto (Muestra el texto) -->
             <td>
-              <a *ngIf="user.role === 'programador' && user.contactUrl" 
-                 [href]="user.contactUrl" 
-                 target="_blank" 
-                 class="link-text"
-                 title="{{ user.contactUrl }}">
-                 {{ user.contactUrl }}
-              </a>
-              <span *ngIf="user.role === 'programador' && !user.contactUrl" class="na-text">---</span>
-              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
-            </td>
-
-            <!-- Redes (Muestra el texto) -->
-            <td>
-              <a *ngIf="user.role === 'programador' && user.socialUrl" 
-                 [href]="user.socialUrl" 
-                 target="_blank" 
-                 class="link-text"
-                 title="{{ user.socialUrl }}">
-                 {{ user.socialUrl }}
-              </a>
-              <span *ngIf="user.role === 'programador' && !user.socialUrl" class="na-text">---</span>
-              <span *ngIf="user.role !== 'programador'" class="na-text">N/A</span>
-            </td>
-
-            <!-- Botones de Acción (Con color) -->
-            <td>
-              <button class="btn-icon edit" (click)="startEdit(user)" title="Editar">✎</button>
-              <button class="btn-icon delete" (click)="deleteUser(user.uid)" title="Eliminar">🗑</button>
+              <button class="btn-icon edit" (click)="startEdit(user)">✎</button>
+              <button class="btn-icon delete" (click)="deleteUser(user.correo)">🗑</button>
             </td>
           </ng-container>
 
-          <!-- ================= MODO EDICIÓN (Formulario) ================= -->
-          <ng-container *ngIf="editingId === user.uid">
-            <td><input type="text" [(ngModel)]="editForm.displayName" class="input-dark"></td>
-            
+          <ng-container *ngIf="editingId === user.correo">
             <td>
-              <select [(ngModel)]="editForm.role" class="input-dark">
-                <option value="usuario">Usuario</option>
-                <option value="programador">Programador</option>
-                <option value="admin">Admin</option>
+              <input type="text" [ngModel]="user.persona?.['cedula'] || user.persona?.['per_cedula']" class="input-dark"
+                disabled>
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="editForm.nombre" class="input-dark">
+            </td>
+            <td>
+              <select [(ngModel)]="editForm.rol" class="input-dark">
+                <option value="CLIENTE">CLIENTE</option>
+                <option value="PROGRAMADOR">PROGRAMADOR</option>
+                <option value="ADMIN">ADMIN</option>
               </select>
             </td>
-            
-            <td><input type="text" [(ngModel)]="editForm.specialty" class="input-dark"></td>
-            
-            <!-- Edición Rango -->
-            <td>
-              <div *ngIf="editForm.role === 'programador'" style="display:flex; flex-direction:column; gap:5px;">
-                <select [(ngModel)]="editForm.horaInicio" class="input-dark"><option *ngFor="let h of horasPosibles" [value]="h">{{h}}</option></select>
-                <select [(ngModel)]="editForm.horaFin" class="input-dark"><option *ngFor="let h of horasPosibles" [value]="h">{{h}}</option></select>
-              </div>
-              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
-            </td>
-
-            <!-- Edición Contacto -->
-            <td>
-              <input *ngIf="editForm.role === 'programador'" type="text" [(ngModel)]="editForm.contactUrl" placeholder="WhatsApp/Tel" class="input-dark">
-              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
-            </td>
-
-            <!-- Edición Redes -->
-            <td>
-              <input *ngIf="editForm.role === 'programador'" type="text" [(ngModel)]="editForm.socialUrl" placeholder="LinkedIn/Git" class="input-dark">
-              <span *ngIf="editForm.role !== 'programador'" class="na-text">N/A</span>
-            </td>
-
             <td>
               <button class="btn-save" (click)="saveUser()">OK</button>
               <button class="btn-cancel" (click)="cancelEdit()">X</button>
@@ -127,20 +71,32 @@
   </div>
 </div>
 
-<!-- Modal para crear usuario (Se mantiene igual) -->
 <div class="modal-overlay" *ngIf="showCreateModal">
   <div class="modal-content">
-    <h2>Registrar Nuevo Usuario</h2>
-    <div class="form-group"><label>Nombre</label><input type="text" [(ngModel)]="newUser.displayName" class="input-dark"></div>
-    <div class="form-group"><label>Correo</label><input type="email" [(ngModel)]="newUser.email" class="input-dark"></div>
-    <div class="form-group"><label>Rol</label>
-      <select [(ngModel)]="newUser.role" class="input-dark">
-        <option value="usuario">Usuario</option><option value="programador">Programador</option><option value="admin">Admin</option>
+    <h2>Nuevo Usuario en PostgreSQL</h2>
+    <div class="form-group">
+      <label>Cédula</label>
+      <input type="text" [(ngModel)]="newUser.cedula" class="input-dark">
+    </div>
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="newUser.nombre" class="input-dark">
+    </div>
+    <div class="form-group">
+      <label>Correo</label>
+      <input type="email" [(ngModel)]="newUser.correo" class="input-dark">
+    </div>
+    <div class="form-group">
+      <label>Rol</label>
+      <select [(ngModel)]="newUser.rol" class="input-dark">
+        <option value="CLIENTE">Cliente</option>
+        <option value="PROGRAMADOR">Programador</option>
+        <option value="ADMIN">Admin</option>
       </select>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" (click)="toggleCreateModal()">Cancelar</button>
-      <button class="btn-save" (click)="createUser()">Crear</button>
+      <button class="btn-save" (click)="createUser()">Registrar</button>
     </div>
   </div>
 </div>
