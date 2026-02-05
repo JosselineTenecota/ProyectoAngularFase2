@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Proyecto } from '../../core/models/proyecto.interface';
 import { ProyectosService } from '../../core/services/proyectos';
@@ -20,7 +20,7 @@ export class MisProyectos implements OnInit {
   private proyectosService = inject(ProyectosService);
 
   ngOnInit() {
-    // El 'id' de la URL debe ser la CÉDULA de la persona para que Postgres filtre bien
+    // Obtenemos la cédula de la URL para filtrar en Postgres
     const cedula = this.route.snapshot.paramMap.get('id'); 
     
     if (cedula) {
@@ -33,6 +33,8 @@ export class MisProyectos implements OnInit {
           this.loading = false;
         }
       });
+    } else {
+        this.loading = false;
     }
   }
 }

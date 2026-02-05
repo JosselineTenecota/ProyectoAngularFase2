@@ -15,19 +15,14 @@
   <div class="dash-grid">
     <section class="form-card">
       <h2>📝 Nuevo Proyecto</h2>
-
       <form (ngSubmit)="addProject()" #projectForm="ngForm">
         <div class="form-group">
           <label>Título del Proyecto *</label>
-          <input type="text" name="titulo" [(ngModel)]="newProject.titulo" required
-            class="input-dark" [class.invalid-border]="projectForm.submitted && !newProject.titulo"
-            placeholder="Ej: E-commerce API">
+          <input type="text" name="titulo" [(ngModel)]="newProject.titulo" required class="input-dark">
         </div>
-
         <div class="form-group">
           <label>Descripción *</label>
-          <textarea name="descripcion" [(ngModel)]="newProject.descripcion" required rows="3"
-            class="input-dark" placeholder="¿Qué hiciste en este proyecto?"></textarea>
+          <textarea name="descripcion" [(ngModel)]="newProject.descripcion" required rows="2" class="input-dark"></textarea>
         </div>
 
         <div class="form-row">
@@ -50,70 +45,58 @@
 
         <div class="form-group">
           <label>Stack Tecnológico</label>
-          <input type="text" name="tecnologias" [(ngModel)]="newProject.tecnologias"
-            class="input-dark" placeholder="Angular, Java, PostgreSQL...">
+          <input type="text" name="tecnologias" [(ngModel)]="newProject.tecnologias" placeholder="Ej: Angular, Java, JPA" class="input-dark">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <input type="url" name="urlRepo" [(ngModel)]="newProject.urlRepo"
-              class="input-dark" style="font-size: 0.8rem;" placeholder="Link GitHub">
+            <label>GitHub URL</label>
+            <input type="url" name="urlRepo" [(ngModel)]="newProject.urlRepo" class="input-dark">
           </div>
           <div class="form-group">
-            <input type="url" name="urlDeploy" [(ngModel)]="newProject.urlDeploy"
-              class="input-dark" style="font-size: 0.8rem;" placeholder="Link Demo">
+            <label>Demo URL</label>
+            <input type="url" name="urlDeploy" [(ngModel)]="newProject.urlDeploy" class="input-dark">
           </div>
         </div>
 
-        <button type="submit" [disabled]="!projectForm.valid" class="btn-submit">
-          Guardar Proyecto en BD
-        </button>
+        <button type="submit" [disabled]="!projectForm.valid" class="btn-submit">Guardar Proyecto en BD</button>
       </form>
     </section>
 
     <section class="projects-list">
-      
       <div class="mb-10">
         <h2 style="color: #ab47bc;">🎓 Proyectos Académicos</h2>
-        <div *ngFor="let p of academicos$ | async" class="project-card">
-          <div class="card-header">
-            <h3>{{ p.titulo }}</h3>
-            <button (click)="deleteProject($any(p).codigo)" class="btn-delete">🗑</button>
+        <div *ngIf="(academicos$ | async) as progs; else loadingProjects">
+          <div *ngFor="let p of progs" class="project-card">
+            <div class="card-header">
+              <h3>{{ p.titulo }}</h3>
+              <button (click)="deleteProject(p.codigo)" class="btn-delete">🗑</button>
+            </div>
+            <p class="tech-small"><strong>Stack:</strong> {{ p.tecnologias }}</p>
+            <p class="desc">{{ p.descripcion }}</p>
           </div>
-          <p class="tech">{{ p.tecnologias }}</p>
-          <p class="desc">{{ p.descripcion }}</p>
-          <div class="links">
-            <a *ngIf="p.urlRepo" [href]="p.urlRepo" target="_blank">Repo ↗</a>
-            <a *ngIf="p.urlDeploy" [href]="p.urlDeploy" target="_blank">Demo ↗</a>
-          </div>
+          <p *ngIf="progs.length === 0" class="text-gray-600 italic">No hay proyectos académicos.</p>
         </div>
-        <p *ngIf="!(academicos$ | async)?.length" class="text-gray-600 italic">No hay proyectos académicos.</p>
       </div>
 
       <div>
         <h2 style="color: #66bb6a;">💼 Experiencia Laboral</h2>
-        <div *ngFor="let p of laborales$ | async" class="project-card" style="border-left-color: #66bb6a;">
-          <div class="card-header">
-            <h3>{{ p.titulo }}</h3>
-            <button (click)="deleteProject($any(p).codigo)" class="btn-delete">🗑</button>
+        <div *ngIf="(laborales$ | async) as jobs; else loadingProjects">
+          <div *ngFor="let p of jobs" class="project-card" style="border-left-color: #66bb6a;">
+            <div class="card-header">
+              <h3>{{ p.titulo }}</h3>
+              <button (click)="deleteProject(p.codigo)" class="btn-delete">🗑</button>
+            </div>
+            <p class="tech-small"><strong>Stack:</strong> {{ p.tecnologias }}</p>
+            <p class="desc">{{ p.descripcion }}</p>
           </div>
-          <p class="tech">{{ p.tecnologias }}</p>
-          <p class="desc">{{ p.descripcion }}</p>
+          <p *ngIf="jobs.length === 0" class="text-gray-600 italic">No hay experiencia registrada.</p>
         </div>
-        <p *ngIf="!(laborales$ | async)?.length" class="text-gray-600 italic">No hay experiencia registrada.</p>
       </div>
     </section>
   </div>
-
-  <footer class="mt-12 border-t border-gray-800 pt-8">
-    <h2 style="color: #ffb300; font-size: 1.6rem; margin-bottom: 20px;">📩 Solicitudes de Asesoría</h2>
-    <div class="appointments-grid">
-      <div *ngIf="(asesorias$ | async) as solicitudes; else loading">
-        <p *ngIf="solicitudes.length === 0" class="text-gray-600 italic">No hay solicitudes pendientes.</p>
-        <div *ngFor="let a of solicitudes" class="appt-card pendiente">
-          </div>
-      </div>
-      <ng-template #loading><p>Cargando asesorías...</p></ng-template>
-    </div>
-  </footer>
 </div>
+
+<ng-template #loadingProjects>
+  <p class="text-gray-500">Cargando proyectos...</p>
+</ng-template>

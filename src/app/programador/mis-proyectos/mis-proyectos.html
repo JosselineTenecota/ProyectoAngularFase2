@@ -4,12 +4,10 @@
 
   <div *ngFor="let p of proyectos" class="card">
 
-    <!-- Top Section estilo Universe.io -->
     <div class="top-section">
       <div class="border"></div>
       <div class="icons">
         <div class="logo">
-          <!-- Logo simplificado sin imágenes -->
           <div class="placeholder-icon">P</div>
         </div>
         <div class="social-media">
@@ -20,7 +18,6 @@
       </div>
     </div>
 
-    <!-- Bottom Section con tu info -->
     <div class="bottom-section">
       <span class="title">{{ p.titulo }}</span>
 
@@ -43,5 +40,5 @@
 </div>
 
 <ng-template #cargando>
-  <div class="loader">Cargando...</div>
+  <div *ngIf="!loading" class="loader">No se encontraron proyectos.</div>
 </ng-template>

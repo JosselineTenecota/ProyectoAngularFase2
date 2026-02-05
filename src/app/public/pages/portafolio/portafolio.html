@@ -1,25 +1,16 @@
-<p>portafolio works!</p>
 <div class="portfolio-container wrapper" *ngIf="programmer; else loadingTpl">
 
-  <!-- Encabezado del Perfil -->
   <header class="profile-header">
     <img [src]="programmer.photoURL || 'https://ui-avatars.com/api/?name='+programmer.displayName" class="profile-img">
-
     <div class="profile-info">
       <span class="badge">{{ programmer.specialty || 'Programador' }}</span>
       <h1>{{ programmer.displayName }}</h1>
       <p class="bio">{{ programmer.description }}</p>
-
-      <div class="contact-actions">
-        <a href="mailto:{{programmer.email}}" class="btn-contact">Contactar</a>
-        <!-- Aquí podrías poner botón de agendar asesoría más adelante -->
-      </div>
     </div>
   </header>
 
   <hr class="divider">
 
-  <!-- Sección de Proyectos -->
   <section class="projects-section">
     <h2>Proyectos Realizados</h2>
 
@@ -27,33 +18,32 @@
       <div class="project-card" *ngFor="let p of projects$ | async">
         <div class="card-top">
           <span class="type-badge" [class.laboral]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
+          <span class="role-badge">{{ p.participacion }}</span>
         </div>
 
         <h3>{{ p.titulo }}</h3>
-        <p class="tech-stack">{{ p.tecnologias }}</p>
+        
+        <p class="tech-stack"><strong>Stack:</strong> {{ p.tecnologias }}</p>
+        
         <p class="description">{{ p.descripcion }}</p>
 
         <div class="project-actions">
           <a *ngIf="p.urlRepo" [href]="p.urlRepo" target="_blank" class="link-btn">
-            Ver Repositorio
+            GitHub ↗
           </a>
           <a *ngIf="p.urlDeploy" [href]="p.urlDeploy" target="_blank" class="link-btn primary">
-            Ver Demo
+            Demo ↗
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Si no hay proyectos -->
     <div *ngIf="(projects$ | async)?.length === 0" class="empty-state">
-      <p>Este programador aún no ha publicado proyectos.</p>
+      <p>Aún no hay proyectos publicados.</p>
     </div>
   </section>
-
 </div>
 
 <ng-template #loadingTpl>
-  <div class="loading-screen">
-    <p>Cargando perfil...</p>
-  </div>
+  <div class="loading-screen"><p>Cargando perfil...</p></div>
 </ng-template>

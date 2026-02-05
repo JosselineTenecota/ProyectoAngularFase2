@@ -2,9 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 import Swal from 'sweetalert2';
-
 import { Proyecto } from '../../core/models/proyecto.interface';
 import { ProyectosService } from '../../core/services/proyectos';
 import { AuthService } from '../../core/services/auth';
@@ -23,54 +21,46 @@ export class Dashboard implements OnInit {
   currentUser: any = null;
   academicos$: Observable<Proyecto[]> = of([]);
   laborales$: Observable<Proyecto[]> = of([]);
-
-  // ARREGLO: Añadimos la variable que pide el HTML
   asesorias$: Observable<any[]> = of([]);
 
-  submitted = false;
-
-  newProject: any = {
-    titulo: '',
-    descripcion: '',
-    tipo: 'Academico',
-    participacion: 'Frontend',
-    tecnologias: '',
-    urlRepo: '',
-    urlDeploy: ''
+  // Objeto inicial con todos los campos necesarios para tu portafolio
+  newProject: any = { 
+    titulo: '', 
+    descripcion: '', 
+    tipo: 'Academico', 
+    participacion: 'Frontend', 
+    tecnologias: '', 
+    urlRepo: '', 
+    urlDeploy: '' 
   };
 
   ngOnInit() {
     this.authService.userData$.subscribe(user => {
-      if (user) {
-        this.currentUser = user;
-        this.loadMyProjects(user.cedula);
-      } else {
-        const fallbackUser = this.authService.currentUser;
-        if (fallbackUser) {
-          this.currentUser = fallbackUser;
-          this.loadMyProjects(fallbackUser.cedula);
-        }
+      const activeUser = user || this.authService.currentUser;
+      if (activeUser?.cedula) {
+        this.currentUser = activeUser;
+        this.loadMyProjects(activeUser.cedula);
       }
     });
   }
 
   loadMyProjects(cedula: string) {
     if (!cedula) return;
-    const allProjects$ = this.proyectosService.getProyectosPorProgramador(cedula);
+    this.proyectosService.getProyectosPorProgramador(cedula).subscribe(all => {
+      // Filtrado por tipo (normalizado para evitar errores de mayúsculas)
+      this.academicos$ = of(all.filter(p => this.norm(p.tipo) === 'academico'));
+      this.laborales$ = of(all.filter(p => this.norm(p.tipo) === 'laboral'));
+    });
+  }
 
-    this.academicos$ = allProjects$.pipe(
-      map(projects => projects.filter(p => p.tipo === 'Academico'))
-    );
-
-    this.laborales$ = allProjects$.pipe(
-      map(projects => projects.filter(p => p.tipo === 'Laboral'))
-    );
+  private norm(t: string): string {
+    return t ? t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
   }
 
   addProject() {
-    if (!this.currentUser?.correo) return;
+    if (!this.currentUser?.cedula) return;
 
-    // Creamos el objeto limpio para evitar enviar IDs nulos o basura
+    // Se envían TODOS los atributos que requiere tu portafolio
     const proyectoData: Proyecto = {
       titulo: this.newProject.titulo,
       descripcion: this.newProject.descripcion,
@@ -81,32 +71,33 @@ export class Dashboard implements OnInit {
       urlDeploy: this.newProject.urlDeploy
     };
 
-    this.proyectosService.crearProyecto(proyectoData, this.currentUser.correo).subscribe({
+    this.proyectosService.crearProyecto(proyectoData, this.currentUser.cedula).subscribe({
       next: () => {
-        Swal.fire('¡Éxito!', 'Proyecto guardado', 'success');
+        Swal.fire('¡Éxito!', 'Proyecto guardado con todos sus detalles', 'success');
         this.loadMyProjects(this.currentUser.cedula);
         this.resetForm();
       },
       error: (err) => {
-        console.error("Error detallado:", err);
-        Swal.fire('Error', 'Error de persistencia en PostgreSQL (programador_id null)', 'error');
+        console.error(err);
+        Swal.fire('Error', 'No se pudo guardar. Revisa la consola.', 'error');
       }
     });
   }
 
-  deleteProject(codigo: number) {
+  deleteProject(codigo?: number) {
     if (!codigo) return;
-    this.proyectosService.eliminar(codigo).subscribe(() => {
-      this.loadMyProjects(this.currentUser.cedula);
-      Swal.fire('Eliminado', 'Proyecto borrado', 'success');
-    });
+    this.proyectosService.eliminar(codigo).subscribe(() => this.loadMyProjects(this.currentUser.cedula));
   }
 
   resetForm() {
-    this.submitted = false;
-    this.newProject = {
-      titulo: '', descripcion: '', tipo: 'Academico',
-      participacion: 'Frontend', tecnologias: '', urlRepo: '', urlDeploy: ''
+    this.newProject = { 
+      titulo: '', 
+      descripcion: '', 
+      tipo: 'Academico', 
+      participacion: 'Frontend', 
+      tecnologias: '', 
+      urlRepo: '', 
+      urlDeploy: '' 
     };
   }
 }
