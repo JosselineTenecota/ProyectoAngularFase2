@@ -13,7 +13,7 @@
         <tr>
           <th>Cédula</th>
           <th>Perfil / Correo</th>
-          <th>Rol</th>
+          <th>WhatsApp</th> <th>Rol</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -21,17 +21,17 @@
         <tr *ngFor="let user of users$ | async">
           
           <ng-container *ngIf="editingId !== user.correo">
-            <td>{{ user.persona?.cedula || user.persona?.per_cedula || '---' }}</td>
+            <td>{{ user.persona?.cedula || '---' }}</td>
             <td>
               <div class="user-info">
-                <img [src]="'https://ui-avatars.com/api/?name=' + (user.persona?.nombre || user.persona?.per_nombre || 'U')" class="avatar">
+                <img [src]="'https://ui-avatars.com/api/?name=' + (user.persona?.nombre || 'U')" class="avatar">
                 <div>
-                  <div class="name">{{ user.persona?.nombre || user.persona?.per_nombre || 'Sin Nombre' }}</div>
+                  <div class="name">{{ user.persona?.nombre || 'Sin Nombre' }}</div>
                   <div class="email">{{ user.correo }}</div>
                 </div>
               </div>
             </td>
-            <td>
+            <td>{{ user.persona?.telefono || '---' }}</td> <td>
               <span class="role-badge" [ngClass]="user.rol?.toLowerCase()">
                 {{ user.rol }}
               </span>
@@ -44,10 +44,16 @@
 
           <ng-container *ngIf="editingId === user.correo">
             <td>
-              <input type="text" [ngModel]="user.persona?.cedula || user.persona?.per_cedula" class="input-dark" disabled>
+              <input type="text" [value]="user.persona?.cedula" class="input-dark" disabled>
             </td>
             <td>
-              <input type="text" [(ngModel)]="editForm.nombre" class="input-dark" placeholder="Nombre completo">
+              <div class="edit-cell">
+                <input type="text" [(ngModel)]="editForm.tempNombre" class="input-dark" placeholder="Nombre completo">
+                <div class="email-sub">{{ user.correo }}</div>
+              </div>
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="editForm.tempTelefono" class="input-dark" placeholder="WhatsApp">
             </td>
             <td>
               <select [(ngModel)]="editForm.rol" class="input-dark">
@@ -57,8 +63,10 @@
               </select>
             </td>
             <td>
-              <button class="btn-save" (click)="saveUser()">Guardar</button>
-              <button class="btn-cancel" (click)="cancelEdit()">X</button>
+              <div class="action-buttons">
+                <button class="btn-save" (click)="saveUser()">Guardar</button>
+                <button class="btn-cancel" (click)="cancelEdit()">X</button>
+              </div>
             </td>
           </ng-container>
 
@@ -78,6 +86,10 @@
     <div class="form-group">
       <label>Nombre</label>
       <input type="text" [(ngModel)]="newUser.nombre" class="input-dark">
+    </div>
+    <div class="form-group">
+      <label>WhatsApp</label>
+      <input type="text" [(ngModel)]="newUser.telefono" class="input-dark" placeholder="Ej: 0987654321">
     </div>
     <div class="form-group">
       <label>Correo</label>

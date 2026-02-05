@@ -1,73 +1,67 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
-import { adminGuard } from './core/guards/admin-guard';
-import { programadorGuard } from './core/guards/programador-guard';
 
 export const routes: Routes = [
   // --- RUTAS PÚBLICAS ---
   {
     path: '',
-    loadComponent: () =>
-      import('./public/pages/home/home').then(m => m.Home),
+    loadComponent: () => import('./public/pages/home/home').then(m => m.Home),
   },
   {
     path: 'login',
-    loadComponent: () =>
-      import('./auth/login/login').then(m => m.Login),
+    loadComponent: () => import('./auth/login/login').then(m => m.Login),
   },
   {
     path: 'portafolios',
-    loadComponent: () =>
-      import('./public/pages/programadores/programadores').then(m => m.Programadores),
+    loadComponent: () => import('./public/pages/programadores/programadores').then(m => m.Programadores),
   },
   {
     path: 'portafolio/:id',
-    loadComponent: () =>
-      import('./public/pages/portafolio/portafolio').then(m => m.Portafolio),
-  },
-  {
-    path: 'agendar',
-    loadComponent: () =>
-      import('./asesorias/agendar/agendar.component').then(m => m.AgendarComponent),
+    loadComponent: () => import('./public/pages/portafolio/portafolio').then(m => m.Portafolio),
   },
 
   // --- RUTAS PROTEGIDAS (ADMIN) ---
   {
     path: 'admin',
-    // Si la redirección falla, comenta canActivate temporalmente para probar
-    canActivate: [authGuard, adminGuard], 
-    loadComponent: () =>
-      import('./admin/admin-dashboard/admin-dashboard')
-        .then(m => m.AdminDashboard),
+    canActivate: [authGuard], 
+    data: { role: 'ADMIN' }, // El guard verificará que Java devolvió 'ADMIN'
+    loadComponent: () => import('./admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard),
   },
 
   // --- RUTAS PROTEGIDAS (PROGRAMADOR) ---
   {
     path: 'programador',
-    canActivate: [authGuard, programadorGuard],
+    canActivate: [authGuard],
+    data: { role: 'PROGRAMADOR' }, // El guard verificará que Java devolvió 'PROGRAMADOR'
     children: [
       {
-        path: '', // Esta es la ruta /programador
+        path: '',
         loadComponent: () => import('./programador/dashboard/dashboard').then(m => m.Dashboard),
       },
       {
-        path: 'solicitudes', // Esta es la ruta /programador/solicitudes
+        path: 'solicitudes',
         loadComponent: () => import('./asesorias/solicitar/solicitar').then(m => m.Solicitar)
       }
     ]
   },
 
-  // --- OTRAS RUTAS DE GESTIÓN ---
+  // --- RUTAS DE GESTIÓN (CLIENTE / MIXTO) ---
   {
-    path: 'portafolio/:id/proyectos',
-    loadComponent: () =>
-      import('./programador/mis-proyectos/mis-proyectos').then(m => m.MisProyectos),
+    path: 'agendar',
+    canActivate: [authGuard],
+    loadComponent: () => import('./asesorias/agendar/agendar.component').then(m => m.AgendarComponent),
   },
   {
     path: 'mis-asesorias',
+    canActivate: [authGuard],
     loadComponent: () => import('./asesorias/solicitar/solicitar').then(m => m.Solicitar),
   },
+  {
+    path: 'portafolio/:id/proyectos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./programador/mis-proyectos/mis-proyectos').then(m => m.MisProyectos),
+  },
 
-  // --- COMODÍN (SIEMPRE AL FINAL) ---
+  // --- COMODÍN ---
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
