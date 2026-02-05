@@ -23,53 +23,56 @@ export class AuthService {
 
   private apiUrl = `${environment.apiUrl}/usuarios`;
 
-  // Estado reactivo del usuario para toda la aplicación
   private userData = new BehaviorSubject<any>(null);
   userData$ = this.userData.asObservable();
 
-  // En el constructor del AuthService.ts
-constructor() {
-  onAuthStateChanged(this.auth, async (firebaseUser: FirebaseUser | null) => {
-    if (firebaseUser) {
-      // 1. Firebase dice que el token es válido, pero vamos a preguntar a JAVA
-      const javaRol = localStorage.getItem('rol');
-      const userDataStored = localStorage.getItem('user_db'); // Aquí guardaremos el objeto de Postgres
-
-      if (userDataStored) {
-        // 2. Si ya tenemos los datos de Postgres en el navegador, los cargamos
-        this.userData.next(JSON.parse(userDataStored));
+  constructor() {
+    onAuthStateChanged(this.auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const userDataStored = localStorage.getItem('user_db');
+        if (userDataStored) {
+          const userObj = JSON.parse(userDataStored);
+          this.userData.next(userObj);
+          localStorage.setItem('user', userDataStored); // Sincronización para getters
+        } else {
+          this.sincronizarConJava(firebaseUser.email, firebaseUser.displayName);
+        }
       } else {
-        // 3. Si no los tenemos, obligamos a una sincronización con el backend
-        this.sincronizarConJava(firebaseUser.email, firebaseUser.displayName);
+        this.userData.next(null);
+        localStorage.clear();
       }
-    } else {
-      this.userData.next(null);
-      localStorage.clear();
-    }
-  });
-}
-
-// Método auxiliar para asegurar que los datos vengan de TU base de datos
-private async sincronizarConJava(correo: string | null, nombre: string | null) {
-  try {
-    const res = await firstValueFrom(
-      this.http.post<any>(`${this.apiUrl}/login-social`, { correo, nombre })
-    );
-    if (res) {
-      const userFinal = { ...res, rol: res.rol.toLowerCase() };
-      localStorage.setItem('rol', userFinal.rol);
-      localStorage.setItem('user_db', JSON.stringify(userFinal));
-      this.userData.next(userFinal);
-    }
-  } catch (e) {
-    console.error("Error: Java no reconoce este usuario", e);
-    this.logout();
+    });
   }
-}
 
-  // Getters para acceso rápido
+  // ... (Tus otros métodos se mantienen igual)
+
+  private async sincronizarConJava(correo: string | null, nombre: string | null) {
+    try {
+      const res = await firstValueFrom(
+        this.http.post<any>(`${this.apiUrl}/login-social`, { correo, nombre })
+      );
+      if (res) {
+        // Normalizamos el rol a minúsculas para que los Guards no fallen
+        const userFinal = { ...res, rol: res.rol.toLowerCase() };
+
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        localStorage.setItem('rol', userFinal.rol);
+        localStorage.setItem('user_db', JSON.stringify(userFinal)); // La que usas tú
+        localStorage.setItem('user', JSON.stringify(userFinal));    // La que usa el Dashboard
+
+        this.userData.next(userFinal);
+        console.log("Sesión sincronizada con Postgres correctamente.");
+      }
+    } catch (e) {
+      console.error("Error: Java no reconoce este usuario", e);
+      this.logout();
+    }
+  }
+
+  // Asegúrate de que este getter sea así para que el Dashboard no falle
   get currentUser() {
-    return this.userData.value;
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 
   get currentRole(): string | null {
@@ -77,58 +80,45 @@ private async sincronizarConJava(correo: string | null, nombre: string | null) {
     return user ? (user.rol || '').toLowerCase() : null;
   }
 
-  /**
-   * LOGIN CON GOOGLE
-   * 1. Autentica en Firebase.
-   * 2. Envía datos al Backend Java para validación o auto-registro.
-   */
   async loginWithGoogle() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
 
-      // Preparamos el payload con los campos que espera el LoginDTO en Java
       const payload = {
         correo: result.user.email,
         nombre: result.user.displayName || 'Usuario de Google'
       };
 
-      console.log("Sincronizando con Backend Java...", payload.correo);
-
-      // Llamada al endpoint login-social corregido
       const res = await firstValueFrom(
         this.http.post<any>(`${this.apiUrl}/login-social`, payload)
       );
 
       if (res && res.rol) {
         const roleNormalized = res.rol.toLowerCase();
-        
-        // Guardamos en persistencia local
         localStorage.setItem('rol', roleNormalized);
         if (res.token) localStorage.setItem('token', res.token);
 
-        // Actualizamos estado global
-        this.userData.next({ 
-          ...result.user, 
+        const sessionData = {
+          ...res, // Datos de Postgres (cedula, nombre, etc)
           rol: roleNormalized,
-          dbData: res // Contiene el objeto Persona (cedula, nombre, telefono, etc.)
-        });
+          firebaseData: result.user
+        };
+
+        localStorage.setItem('user_db', JSON.stringify(sessionData));
+        localStorage.setItem('user', JSON.stringify(sessionData));
+        this.userData.next(sessionData);
 
         return res;
       }
       return null;
     } catch (error) {
       console.error("Error en el flujo de Login Social:", error);
-      // Si falla la sincronización con Java, cerramos Firebase por seguridad
       await signOut(this.auth);
       throw error;
     }
   }
 
-  /**
-   * LOGIN TRADICIONAL
-   * Para usuarios que ingresan con correo y contraseña manual.
-   */
   async loginWithJava(user: User): Promise<LoginResponse> {
     return firstValueFrom(
       this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, user).pipe(
@@ -137,6 +127,7 @@ private async sincronizarConJava(correo: string | null, nombre: string | null) {
             const role = res.rol.toLowerCase();
             localStorage.setItem('token', res.token);
             localStorage.setItem('rol', role);
+            localStorage.setItem('user', JSON.stringify(res));
             this.userData.next({ ...res, rol: role });
           }
         })
@@ -144,10 +135,6 @@ private async sincronizarConJava(correo: string | null, nombre: string | null) {
     );
   }
 
-  /**
-   * LOGOUT
-   * Limpia Firebase y el almacenamiento local de la aplicación.
-   */
   async logout() {
     try {
       await signOut(this.auth);

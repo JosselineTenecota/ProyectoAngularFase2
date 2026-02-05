@@ -28,13 +28,12 @@
 
       <p class="tech">Tecnologías: {{ p.tecnologias }}</p>
 
-      <div class="button-group">
-        <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">
-          <button>Ver Repo</button>
+      <div class="links">
+        <a *ngIf="p.urlRepo" [href]="p.urlRepo" target="_blank">
+          Código
         </a>
-
-        <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">
-          <button>Ver Demo</button>
+        <a *ngIf="p.urlDeploy" [href]="p.urlDeploy" target="_blank">
+          Demo
         </a>
       </div>
     </div>

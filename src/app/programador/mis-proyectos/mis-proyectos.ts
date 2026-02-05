@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { Proyecto } from '../../core/models/proyecto.interface';
 import { ProyectosService } from '../../core/services/proyectos';
 
-
 @Component({
   selector: 'app-mis-proyectos',
   standalone: true,
@@ -14,7 +13,6 @@ import { ProyectosService } from '../../core/services/proyectos';
   styleUrls: ['./mis-proyectos.scss']
 })
 export class MisProyectos implements OnInit {
-
   proyectos$!: Observable<Proyecto[]>;
   loading = true;
 
@@ -22,12 +20,19 @@ export class MisProyectos implements OnInit {
   private proyectosService = inject(ProyectosService);
 
   ngOnInit() {
-    const uid = this.route.snapshot.paramMap.get('id'); // debe coincidir con programmerId
-    if (uid) {
-      this.proyectos$ = this.proyectosService.getProyectosPorProgramador(uid);
-
-      // Para quitar el loader cuando ya haya datos
-      this.proyectos$.subscribe(() => this.loading = false);
+    // El 'id' de la URL debe ser la CÉDULA de la persona para que Postgres filtre bien
+    const cedula = this.route.snapshot.paramMap.get('id'); 
+    
+    if (cedula) {
+      this.proyectos$ = this.proyectosService.getProyectosPorProgramador(cedula);
+      
+      this.proyectos$.subscribe({
+        next: () => this.loading = false,
+        error: (err) => {
+          console.error('Error cargando proyectos de Postgres:', err);
+          this.loading = false;
+        }
+      });
     }
   }
 }

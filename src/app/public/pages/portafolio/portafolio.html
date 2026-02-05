@@ -1,15 +1,15 @@
 <p>portafolio works!</p>
 <div class="portfolio-container wrapper" *ngIf="programmer; else loadingTpl">
-  
+
   <!-- Encabezado del Perfil -->
   <header class="profile-header">
     <img [src]="programmer.photoURL || 'https://ui-avatars.com/api/?name='+programmer.displayName" class="profile-img">
-    
+
     <div class="profile-info">
       <span class="badge">{{ programmer.specialty || 'Programador' }}</span>
       <h1>{{ programmer.displayName }}</h1>
       <p class="bio">{{ programmer.description }}</p>
-      
+
       <div class="contact-actions">
         <a href="mailto:{{programmer.email}}" class="btn-contact">Contactar</a>
         <!-- Aquí podrías poner botón de agendar asesoría más adelante -->
@@ -22,23 +22,23 @@
   <!-- Sección de Proyectos -->
   <section class="projects-section">
     <h2>Proyectos Realizados</h2>
-    
+
     <div class="projects-grid">
       <div class="project-card" *ngFor="let p of projects$ | async">
         <div class="card-top">
           <span class="type-badge" [class.laboral]="p.tipo === 'Laboral'">{{ p.tipo }}</span>
         </div>
-        
+
         <h3>{{ p.titulo }}</h3>
         <p class="tech-stack">{{ p.tecnologias }}</p>
         <p class="description">{{ p.descripcion }}</p>
-        
-        <div class="card-links">
-          <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank" class="link-btn code">
-             Código
+
+        <div class="project-actions">
+          <a *ngIf="p.urlRepo" [href]="p.urlRepo" target="_blank" class="link-btn">
+            Ver Repositorio
           </a>
-          <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank" class="link-btn demo">
-             Ver Demo
+          <a *ngIf="p.urlDeploy" [href]="p.urlDeploy" target="_blank" class="link-btn primary">
+            Ver Demo
           </a>
         </div>
       </div>

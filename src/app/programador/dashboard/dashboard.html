@@ -1,180 +1,119 @@
-<div class="dash-wrapper wrapper">
-  
-  <div class="dash-header">
-    <h1>Mi Portafolio</h1>
-    <p>Bienvenido, gestiona tus proyectos académicos y laborales.</p>
-  </div>
+<div class="dash-wrapper">
+  <header class="dash-header flex justify-between items-center">
+    <div>
+      <h1>Panel de Programador</h1>
+      <p *ngIf="currentUser">
+        Bienvenido, <span style="color: #42a5f5;">{{ currentUser.nombre }}</span> ({{ currentUser.cedula }})
+      </p>
+    </div>
+    <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-800">
+      <span class="text-xs uppercase tracking-widest text-gray-500">Estado:</span>
+      <span class="ml-2 text-green-500 font-mono text-sm">PostgreSQL Online</span>
+    </div>
+  </header>
 
   <div class="dash-grid">
-    
-    <!-- COLUMNA 1: FORMULARIO DE CREACIÓN -->
-  
-    <div class="form-card">
-      <h2>Nuevo Proyecto</h2>
-      
-      <!-- TÍTULO (Con validación visual) -->
-      <div class="form-group">
-        <label>Título del Proyecto <span style="color:#ff5252">*</span></label>
-        <input type="text" 
-               [(ngModel)]="newProject.titulo" 
-               [class.input-error]="submitted && !newProject.titulo"
-               placeholder="Ej: Sistema de Ventas" 
-               class="input-dark">
-        <small class="error-msg" *ngIf="submitted && !newProject.titulo">Obligatorio</small>
-      </div>
+    <section class="form-card">
+      <h2>📝 Nuevo Proyecto</h2>
 
-      <!-- TIPO PROYECTO -->
-      <div class="form-group">
-        <label>Tipo de Proyecto</label>
-        <select [(ngModel)]="newProject.tipo" class="input-dark">
-          <option value="Academico">Académico</option>
-          <option value="Laboral">Laboral</option>
-        </select>
-      </div>
-
-      <!-- TIPO PARTICIPACIÓN -->
-      <div class="form-group">
-        <label>Tipo de Participación</label>
-        <select [(ngModel)]="newProject.participacion" class="input-dark">
-          <option value="Frontend">Frontend</option>
-          <option value="Backend">Backend</option>
-          <option value="Base de Datos">Base de Datos</option>
-        </select>
-      </div>
-
-      <!-- TECNOLOGÍAS -->
-      <div class="form-group">
-        <label>Tecnologías</label>
-        <input type="text" [(ngModel)]="newProject.tecnologias" placeholder="Angular, Firebase..." class="input-dark">
-      </div>
-
-      <!-- DESCRIPCIÓN (Con validación visual) -->
-      <div class="form-group">
-        <label>Descripción <span style="color:#ff5252">*</span></label>
-        <textarea [(ngModel)]="newProject.descripcion" 
-                  [class.input-error]="submitted && !newProject.descripcion"
-                  rows="4" 
-                  class="input-dark"></textarea>
-        <small class="error-msg" *ngIf="submitted && !newProject.descripcion">Obligatorio</small>
-      </div>
-
-      <div class="form-row">
+      <form (ngSubmit)="addProject()" #projectForm="ngForm">
         <div class="form-group">
-          <label>URL Repositorio</label>
-          <input type="text" [(ngModel)]="newProject.repoUrl" class="input-dark">
+          <label>Título del Proyecto *</label>
+          <input type="text" name="titulo" [(ngModel)]="newProject.titulo" required
+            class="input-dark" [class.invalid-border]="projectForm.submitted && !newProject.titulo"
+            placeholder="Ej: E-commerce API">
         </div>
+
         <div class="form-group">
-          <label>URL Demo</label>
-          <input type="text" [(ngModel)]="newProject.demoUrl" class="input-dark">
+          <label>Descripción *</label>
+          <textarea name="descripcion" [(ngModel)]="newProject.descripcion" required rows="3"
+            class="input-dark" placeholder="¿Qué hiciste en este proyecto?"></textarea>
         </div>
-      </div>
 
-      <button class="btn-submit" (click)="addProject()">Publicar Proyecto</button>
-    </div>
-
-    <!-- COLUMNA 2: LISTAS SEPARADAS (ACADÉMICOS / LABORALES) -->
-
-    <div class="projects-list">
-      
-      <!-- SECCIÓN 1: ACADÉMICOS -->
-      <div class="section-block">
-        <h2 class="section-title">🎓 Proyectos Académicos</h2>
-        
-        <!-- Usamos academicos$ en lugar de projects$ -->
-        <div class="project-card" *ngFor="let p of academicos$ | async">
-          <div class="card-header">
-            <div>
-              <span class="badge">Académico</span>
-              <span class="part-badge">{{ p.participacion }}</span>
-            </div>
-            <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoría</label>
+            <select name="tipo" [(ngModel)]="newProject.tipo" class="input-dark">
+              <option value="Academico">Académico</option>
+              <option value="Laboral">Laboral</option>
+            </select>
           </div>
-          
-          <h3>{{ p.titulo }}</h3>
+          <div class="form-group">
+            <label>Rol</label>
+            <select name="participacion" [(ngModel)]="newProject.participacion" class="input-dark">
+              <option value="Frontend">Frontend</option>
+              <option value="Backend">Backend</option>
+              <option value="Fullstack">Fullstack</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Stack Tecnológico</label>
+          <input type="text" name="tecnologias" [(ngModel)]="newProject.tecnologias"
+            class="input-dark" placeholder="Angular, Java, PostgreSQL...">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <input type="url" name="urlRepo" [(ngModel)]="newProject.urlRepo"
+              class="input-dark" style="font-size: 0.8rem;" placeholder="Link GitHub">
+          </div>
+          <div class="form-group">
+            <input type="url" name="urlDeploy" [(ngModel)]="newProject.urlDeploy"
+              class="input-dark" style="font-size: 0.8rem;" placeholder="Link Demo">
+          </div>
+        </div>
+
+        <button type="submit" [disabled]="!projectForm.valid" class="btn-submit">
+          Guardar Proyecto en BD
+        </button>
+      </form>
+    </section>
+
+    <section class="projects-list">
+      
+      <div class="mb-10">
+        <h2 style="color: #ab47bc;">🎓 Proyectos Académicos</h2>
+        <div *ngFor="let p of academicos$ | async" class="project-card">
+          <div class="card-header">
+            <h3>{{ p.titulo }}</h3>
+            <button (click)="deleteProject($any(p).codigo)" class="btn-delete">🗑</button>
+          </div>
           <p class="tech">{{ p.tecnologias }}</p>
           <p class="desc">{{ p.descripcion }}</p>
-          
           <div class="links">
-            <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">Código</a>
-            <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">Demo</a>
+            <a *ngIf="p.urlRepo" [href]="p.urlRepo" target="_blank">Repo ↗</a>
+            <a *ngIf="p.urlDeploy" [href]="p.urlDeploy" target="_blank">Demo ↗</a>
           </div>
         </div>
-
-        <div *ngIf="(academicos$ | async)?.length === 0" class="empty-mini">
-          No hay proyectos académicos.
-        </div>
+        <p *ngIf="!(academicos$ | async)?.length" class="text-gray-600 italic">No hay proyectos académicos.</p>
       </div>
 
-      <hr class="divider">
-
-      <!-- SECCIÓN 2: LABORALES -->
-      <div class="section-block">
-        <h2 class="section-title">💼 Proyectos Laborales</h2>
-
-        <!-- Usamos laborales$ en lugar de projects$ -->
-        <div class="project-card" *ngFor="let p of laborales$ | async">
+      <div>
+        <h2 style="color: #66bb6a;">💼 Experiencia Laboral</h2>
+        <div *ngFor="let p of laborales$ | async" class="project-card" style="border-left-color: #66bb6a;">
           <div class="card-header">
-            <div>
-              <span class="badge work">Laboral</span>
-              <span class="part-badge">{{ p.participacion }}</span>
-            </div>
-            <button class="btn-delete" (click)="deleteProject(p.id!)">×</button>
+            <h3>{{ p.titulo }}</h3>
+            <button (click)="deleteProject($any(p).codigo)" class="btn-delete">🗑</button>
           </div>
-          
-          <h3>{{ p.titulo }}</h3>
           <p class="tech">{{ p.tecnologias }}</p>
           <p class="desc">{{ p.descripcion }}</p>
-          
-          <div class="links">
-            <a *ngIf="p.repoUrl" [href]="p.repoUrl" target="_blank">Código</a>
-            <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank">Demo</a>
-          </div>
         </div>
-
-        <div *ngIf="(laborales$ | async)?.length === 0" class="empty-mini">
-          No hay proyectos laborales.
-        </div>
+        <p *ngIf="!(laborales$ | async)?.length" class="text-gray-600 italic">No hay experiencia registrada.</p>
       </div>
-
-    </div>
-
+    </section>
   </div>
 
-  <!-- SECCIÓN DE ASESORÍAS -->
-
-  <div class="appointments-section">
-    <h2>Solicitudes de Asesoría Recibidas</h2>
-    
+  <footer class="mt-12 border-t border-gray-800 pt-8">
+    <h2 style="color: #ffb300; font-size: 1.6rem; margin-bottom: 20px;">📩 Solicitudes de Asesoría</h2>
     <div class="appointments-grid">
-      <div class="appt-card" *ngFor="let cita of asesorias$ | async" [ngClass]="cita.estado.toLowerCase()">
-        
-        <div class="appt-header">
-          <span class="status-badge" [ngClass]="cita.estado.toLowerCase()">{{ cita.estado }}</span>
-          <span class="date">{{ cita.fecha }} | {{ cita.hora }}</span>
-        </div>
-
-        <h3>{{ cita.clienteNombre }}</h3>
-        <span class="email-client">{{ cita.clienteEmail }}</span>
-        
-        <div class="topic-box">
-          <strong>Tema:</strong> {{ cita.tema }}
-        </div>
-
-        <div class="answer-box" *ngIf="cita.respuesta">
-          <strong>Tu respuesta:</strong> {{ cita.respuesta }}
-        </div>
-
-        <div class="actions" *ngIf="cita.estado === 'Pendiente'">
-          <button class="btn-action approve" (click)="responderAsesoria(cita, 'Aprobada')">Aprobar</button>
-          <button class="btn-action reject" (click)="responderAsesoria(cita, 'Rechazada')">Rechazar</button>
-        </div>
-
+      <div *ngIf="(asesorias$ | async) as solicitudes; else loading">
+        <p *ngIf="solicitudes.length === 0" class="text-gray-600 italic">No hay solicitudes pendientes.</p>
+        <div *ngFor="let a of solicitudes" class="appt-card pendiente">
+          </div>
       </div>
-
-      <div *ngIf="(asesorias$ | async)?.length === 0" class="empty-state-appt">
-        No tienes solicitudes pendientes.
-      </div>
+      <ng-template #loading><p>Cargando asesorías...</p></ng-template>
     </div>
-  </div>
-
+  </footer>
 </div>

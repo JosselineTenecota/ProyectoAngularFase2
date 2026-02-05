@@ -1,11 +1,10 @@
 export interface Proyecto {
-  id?: string;
-  programmerId: string;
-  titulo: string;
-  descripcion: string;
-  tipo: 'Academico' | 'Laboral';
-  participacion: 'Frontend' | 'Backend' | 'Base de Datos'; 
-  tecnologias: string;
-  repoUrl?: string;
-  demoUrl?: string;
+    codigo?: number; // <--- Asegúrate de que esta línea exista
+    titulo: string;
+    descripcion: string;
+    tipo: string;
+    participacion: string;
+    tecnologias: string;
+    urlRepo?: string;
+    urlDeploy?: string;
 }

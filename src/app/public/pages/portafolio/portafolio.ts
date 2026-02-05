@@ -17,6 +17,7 @@ export class Portafolio implements OnInit {
   private route = inject(ActivatedRoute);
   private firestore = inject(Firestore);
 
+  
   programmer: Programador | null = null;
   projects$!: Observable<Proyecto[]>;
   loading = true;

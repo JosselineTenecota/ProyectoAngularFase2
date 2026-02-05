@@ -1,20 +1,24 @@
-// proyectos.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, query, where, collectionData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { Proyecto } from '../models/proyecto.interface';
+import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProyectosService {
-  private firestore = inject(Firestore);
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/proyectos`;
 
-  constructor() {}
+  getProyectosPorProgramador(cedula: string): Observable<Proyecto[]> {
+    return this.http.get<Proyecto[]>(`${this.apiUrl}/programador/${cedula}`);
+  }
 
-  getProyectosPorProgramador(programmerId: string): Observable<Proyecto[]> {
-    const proyectosRef = collection(this.firestore, 'projects'); // Asegúrate del nombre exacto de tu colección
-    const q = query(proyectosRef, where('programmerId', '==', programmerId));
-    return collectionData(q, { idField: 'id' }) as Observable<Proyecto[]>;
+  crearProyecto(proyecto: Proyecto, correo: string): Observable<any> {
+    // IMPORTANTE: El correo se envía como ?correo=...
+    return this.http.post(`${this.apiUrl}?correo=${correo}`, proyecto);
+  }
+
+  eliminar(codigo: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${codigo}`);
   }
 }
