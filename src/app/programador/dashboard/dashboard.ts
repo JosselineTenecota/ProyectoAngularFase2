@@ -21,9 +21,7 @@ export class Dashboard implements OnInit {
   currentUser: any = null;
   academicos$: Observable<Proyecto[]> = of([]);
   laborales$: Observable<Proyecto[]> = of([]);
-  asesorias$: Observable<any[]> = of([]);
 
-  // Objeto inicial con todos los campos necesarios para tu portafolio
   newProject: any = { 
     titulo: '', 
     descripcion: '', 
@@ -36,20 +34,27 @@ export class Dashboard implements OnInit {
 
   ngOnInit() {
     this.authService.userData$.subscribe(user => {
+      // Intentamos capturar el usuario activo
       const activeUser = user || this.authService.currentUser;
-      if (activeUser?.cedula) {
+      
+      // Buscamos per_cedula_fk que es el nombre real en tu BD
+      const cedulaIdentificada = activeUser?.per_cedula_fk || activeUser?.cedula;
+
+      if (cedulaIdentificada) {
         this.currentUser = activeUser;
-        this.loadMyProjects(activeUser.cedula);
+        this.loadMyProjects(cedulaIdentificada);
       }
     });
   }
 
   loadMyProjects(cedula: string) {
-    if (!cedula) return;
-    this.proyectosService.getProyectosPorProgramador(cedula).subscribe(all => {
-      // Filtrado por tipo (normalizado para evitar errores de mayúsculas)
-      this.academicos$ = of(all.filter(p => this.norm(p.tipo) === 'academico'));
-      this.laborales$ = of(all.filter(p => this.norm(p.tipo) === 'laboral'));
+    if (!cedula || cedula === 'undefined') return;
+    this.proyectosService.getProyectosPorProgramador(cedula).subscribe({
+      next: (all) => {
+        this.academicos$ = of(all.filter(p => this.norm(p.tipo) === 'academico'));
+        this.laborales$ = of(all.filter(p => this.norm(p.tipo) === 'laboral'));
+      },
+      error: (err) => console.error("Error cargando proyectos:", err)
     });
   }
 
@@ -57,10 +62,37 @@ export class Dashboard implements OnInit {
     return t ? t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
   }
 
-  addProject() {
-    if (!this.currentUser?.cedula) return;
+  async addProject() {
+    const userStorage = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    // PRIORIDAD: per_cedula_fk (Nombre en tu base de datos)
+    let idFinal = this.currentUser?.per_cedula_fk || 
+                  userStorage.per_cedula_fk || 
+                  this.currentUser?.cedula || 
+                  userStorage.cedula;
 
-    // Se envían TODOS los atributos que requiere tu portafolio
+    // Plan de rescate si el login no trajo la relación
+    if (!idFinal || idFinal === 'undefined') {
+      const { value: cedulaManual } = await Swal.fire({
+        title: 'Cédula no detectada',
+        text: 'No logramos vincular tu correo con una cédula automáticamente.',
+        input: 'text',
+        inputLabel: 'Ingresa tu cédula (Ej: 0107478213):',
+        showCancelButton: true,
+        confirmButtonText: 'Vincular y Guardar',
+        inputValidator: (value) => {
+          if (!value) return '¡La cédula es obligatoria para la base de datos!';
+          return null;
+        }
+      });
+
+      if (cedulaManual) {
+        idFinal = cedulaManual;
+      } else {
+        return;
+      }
+    }
+
     const proyectoData: Proyecto = {
       titulo: this.newProject.titulo,
       descripcion: this.newProject.descripcion,
@@ -71,33 +103,28 @@ export class Dashboard implements OnInit {
       urlDeploy: this.newProject.urlDeploy
     };
 
-    this.proyectosService.crearProyecto(proyectoData, this.currentUser.cedula).subscribe({
+    Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading() });
+
+    this.proyectosService.crearProyecto(proyectoData, idFinal).subscribe({
       next: () => {
-        Swal.fire('¡Éxito!', 'Proyecto guardado con todos sus detalles', 'success');
-        this.loadMyProjects(this.currentUser.cedula);
+        Swal.fire('¡Éxito!', 'Proyecto vinculado a la cédula: ' + idFinal, 'success');
+        this.loadMyProjects(idFinal);
         this.resetForm();
       },
       error: (err) => {
-        console.error(err);
-        Swal.fire('Error', 'No se pudo guardar. Revisa la consola.', 'error');
+        console.error("Error 500:", err);
+        Swal.fire('Error de Base de Datos', 'El ID ' + idFinal + ' no existe en la tabla Personas.', 'error');
       }
     });
   }
 
   deleteProject(codigo?: number) {
     if (!codigo) return;
-    this.proyectosService.eliminar(codigo).subscribe(() => this.loadMyProjects(this.currentUser.cedula));
+    const cedula = this.currentUser?.per_cedula_fk || this.currentUser?.cedula;
+    this.proyectosService.eliminar(codigo).subscribe(() => this.loadMyProjects(cedula));
   }
 
   resetForm() {
-    this.newProject = { 
-      titulo: '', 
-      descripcion: '', 
-      tipo: 'Academico', 
-      participacion: 'Frontend', 
-      tecnologias: '', 
-      urlRepo: '', 
-      urlDeploy: '' 
-    };
+    this.newProject = { titulo: '', descripcion: '', tipo: 'Academico', participacion: 'Frontend', tecnologias: '', urlRepo: '', urlDeploy: '' };
   }
 }

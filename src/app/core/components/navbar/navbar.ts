@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth'; // Ajusta la ruta si es necesario
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-navbar',
@@ -11,18 +11,20 @@ import { AuthService } from '../../services/auth'; // Ajusta la ruta si es neces
   styleUrls: ['./navbar.scss']
 })
 export class Navbar {
-  
-  menuOpen = false;
+  // 1. Inyectamos el servicio como PUBLIC para que el HTML acceda a auth.currentRole
+  public auth = inject(AuthService);
 
-  // IMPORTANTE: 'public' para usar 'auth.currentRole' en el HTML
-  constructor(public auth: AuthService, private router: Router) {}
+  // 2. Propiedad para controlar el menú desplegable en móviles
+  public menuOpen: boolean = false;
 
+  // 3. Método para abrir/cerrar el menú (Hamburger)
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
 
+  // 4. Método para cerrar sesión que llama al servicio
   logout() {
-    this.menuOpen = false;
     this.auth.logout();
+    this.menuOpen = false; // Cerramos el menú por si acaso estaba abierto
   }
 }

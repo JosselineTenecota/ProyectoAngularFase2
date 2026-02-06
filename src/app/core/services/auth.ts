@@ -21,110 +21,103 @@ export class AuthService {
   private router = inject(Router);
   private zone = inject(NgZone);
 
-  // CORRECCIÓN DE RUTA: En tu Java el @Path es "auth"
   private apiUrl = `${environment.apiUrl}/auth`; 
 
   private userData = new BehaviorSubject<any>(null);
   userData$ = this.userData.asObservable();
 
+  // PROPIEDAD CLAVE: Para que el Navbar no de error TS2339
+  public currentRole: string = '';
+
   constructor() {
+    // Inicializar el rol desde el storage si existe al arrancar
+    const storedUser = this.currentUser;
+    if (storedUser) {
+      this.currentRole = storedUser.rol ? storedUser.rol.toLowerCase() : '';
+      this.userData.next(storedUser);
+    }
+
     onAuthStateChanged(this.auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        const userDataStored = localStorage.getItem('user');
-        if (userDataStored) {
-          this.userData.next(JSON.parse(userDataStored));
-        } else {
+        if (!this.currentUser) {
           this.sincronizarConJava(firebaseUser.email, firebaseUser.displayName);
         }
       } else {
-        this.userData.next(null);
-        localStorage.clear();
+        // Solo cerrar si hay datos activos
+        if (localStorage.getItem('user')) {
+          this.logout();
+        }
       }
     });
   }
 
-  /**
-   * MÉTODO 1: Login con Google (Firebase + Java)
-   * Arregla el error TS2339 en login.ts:42
-   */
+  get currentUser() {
+    if (typeof localStorage !== 'undefined') {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user) : null;
+    }
+    return null;
+  }
+
   async loginWithGoogle() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
-
-      const payload = {
-        correo: result.user.email,
-        nombre: result.user.displayName || 'Usuario de Google'
-      };
-
-      // Llamada al endpoint login-social en tu Backend de Java
       const res = await firstValueFrom(
-        this.http.post<any>(`${this.apiUrl}/login-social`, payload)
+        this.http.post<any>(`${this.apiUrl}/login-social`, {
+          correo: result.user.email,
+          nombre: result.user.displayName
+        })
       );
-
-      if (res && res.rol) {
+      if (res) {
         this.establecerSesion(res);
         return res;
       }
       return null;
     } catch (error) {
-      console.error("Error en el flujo de Login Social:", error);
-      await signOut(this.auth);
+      console.error("Error en Login Social:", error);
       throw error;
     }
   }
 
-  /**
-   * MÉTODO 2: Login con Credenciales (Java Directo)
-   * Arregla el error TS2339 en login.ts:57
-   */
   async loginWithJava(user: User): Promise<LoginResponse> {
     return firstValueFrom(
       this.http.post<LoginResponse>(`${this.apiUrl}/login`, user).pipe(
-        tap(res => {
-          if (res.token) {
-            this.establecerSesion(res);
-          }
-        })
+        tap(res => { if (res) this.establecerSesion(res); })
       )
     );
   }
 
-  /**
-   * MÉTODO 3: Sincronización automática
-   */
   private async sincronizarConJava(correo: string | null, nombre: string | null) {
     if (!correo) return;
     try {
       const res = await firstValueFrom(
         this.http.post<any>(`${this.apiUrl}/login-social`, { correo, nombre })
       );
-      if (res && res.cedula) {
-        this.establecerSesion(res);
-      }
+      if (res) this.establecerSesion(res);
     } catch (e) {
-      console.error("Error sincronizando sesión:", e);
+      console.error("Error sincronizando:", e);
     }
   }
 
-  /**
-   * MÉTODO 4: Guardar datos en LocalStorage
-   * Asegura que la cédula se guarde para llenar los paréntesis ()
-   */
   private establecerSesion(res: any) {
     const roleNormalized = res.rol ? res.rol.toLowerCase() : 'programador';
-    const userFinal = { ...res, rol: roleNormalized };
+    
+    // Sincronizamos la propiedad pública para el Navbar
+    this.currentRole = roleNormalized;
 
+    const userFinal = { 
+      ...res, 
+      rol: roleNormalized,
+      // Mapeo para Marlene Quilli: per_cedula_fk es su ID real
+      cedula: res.per_cedula_fk || res.cedula 
+    };
+
+    localStorage.setItem('user', JSON.stringify(userFinal));
     localStorage.setItem('rol', roleNormalized);
-    localStorage.setItem('user', JSON.stringify(userFinal)); 
     if (res.token) localStorage.setItem('token', res.token);
 
     this.userData.next(userFinal);
-  }
-
-  get currentUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
   }
 
   async logout() {
@@ -132,11 +125,12 @@ export class AuthService {
       await signOut(this.auth);
       this.zone.run(() => {
         localStorage.clear();
+        this.currentRole = ''; // Limpiamos el rol
         this.userData.next(null);
         this.router.navigate(['/login'], { replaceUrl: true });
       });
     } catch (error) {
-      console.error('Error cerrando sesión:', error);
+      console.error('Error logout:', error);
     }
   }
 }
