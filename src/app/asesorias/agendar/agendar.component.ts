@@ -50,30 +50,37 @@ export class AgendarComponent implements OnInit {
   }
 
   enviarSolicitud(): void {
-    // IMPORTANTE: Java LocalDateTime requiere segundos (:00)
-    const fechaHoraIso = `${this.solicitud.fecha}T${this.solicitud.hora}:00`;
+  // Ensure strict ISO format for Java LocalDateTime (YYYY-MM-DDTHH:mm:ss)
+  const fechaHoraIso = `${this.solicitud.fecha}T${this.solicitud.hora}:00`;
 
-    const payload = {
-      tema: this.solicitud.tema,
-      fechaHora: fechaHoraIso,
-      estado: 'PENDIENTE',
-      cliente: { 
-        cedula: this.authService.currentUser?.cedula || localStorage.getItem('cedula') 
-      },
-      programador: { 
-        cedula: this.solicitud.programadorCedula 
-      }
-    };
+  // Get current client ID from service or storage
+  const cedulaCliente = this.authService.currentUser?.cedula || localStorage.getItem('cedula');
 
-    this.asesoriasService.crearAsesoria(payload).subscribe({
-      next: () => {
-        alert("¡Asesoría agendada con éxito!");
-        this.router.navigate(['/cliente/inicio']);
-      },
-      error: (err: any) => {
-        console.error("Error 400:", err);
-        alert("Error al agendar. Revisa la consola para más detalles.");
-      }
-    });
-  }
+  // Verify the property names 'cliente' and 'programador' match your Java Entity variables exactly
+  const payload = {
+    tema: this.solicitud.tema,
+    fechaHora: fechaHoraIso,
+    estado: 'PENDIENTE',
+    cliente: { 
+      cedula: cedulaCliente 
+    },
+    programador: { 
+      cedula: this.solicitud.programadorCedula 
+    }
+  };
+
+  console.log("Enviando JSON al servidor:", JSON.stringify(payload));
+
+  this.asesoriasService.crearAsesoria(payload).subscribe({
+    next: () => {
+      alert("¡Asesoría agendada con éxito!");
+      this.router.navigate(['/cliente/inicio']);
+    },
+    error: (err: any) => {
+      console.error("Detalle del error 400:", err);
+      // Helpful tip: Check the 'Network' tab in Chrome for the specific field error
+      alert("Error al agendar: El servidor no pudo procesar los datos.");
+    }
+  });
+}
 }

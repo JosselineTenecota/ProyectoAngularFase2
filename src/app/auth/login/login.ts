@@ -21,21 +21,23 @@ export class Login {
 
   // Redirección centralizada
   private redirectByRole(rol: string) {
-    if (!rol) return;
-    
-    const roleLower = rol.toLowerCase().trim();
-    
-    if (roleLower === 'admin') {
-      console.log('Redirigiendo a Dashboard de Admin...');
-      this.router.navigate(['/admin']);
-    } else if (roleLower === 'programador' || roleLower === 'usuario') {
-      console.log('Redirigiendo a Vista de Programador...');
-      this.router.navigate(['/programador']);
-    } else {
-      console.log('Rol no reconocido, enviando a inicio');
-      this.router.navigate(['/inicio']);
-    }
+  if (!rol) return;
+  
+  const roleLower = rol.toLowerCase().trim();
+  console.log('Procesando rol:', roleLower);
+  
+  if (roleLower === 'admin') {
+    this.router.navigate(['/admin']);
+  } else if (roleLower === 'programador') {
+    this.router.navigate(['/programador']);
+  } else if (roleLower === 'cliente') { // Agregamos explícitamente el caso CLIENTE
+    console.log('Redirigiendo a Vista de Cliente...');
+    this.router.navigate(['/agendar']); 
+  } else {
+    console.log('Rol no reconocido:', roleLower);
+    this.router.navigate(['/']);
   }
+}
 
   async loginGoogle() {
     try {
