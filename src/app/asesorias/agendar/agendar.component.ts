@@ -21,7 +21,6 @@ export class AgendarComponent implements OnInit {
 
   public programadores: any[] = []; 
   public horariosDisponibles: string[] = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
-  public minDate: string = new Date().toISOString().split('T')[0];
   
   public solicitud: any = { 
     programadorCedula: '', 
@@ -34,46 +33,47 @@ export class AgendarComponent implements OnInit {
     this.cargarProgramadores();
   }
 
-  actualizarHorariosDisponibles(): void {
-    console.log("Actualizando horarios para la fecha seleccionada.");
-  }
-
   cargarProgramadores(): void {
     this.usuariosService.listarUsuarios().subscribe({
       next: (res: any[]) => {
-        // Buscamos el rol PROGRAMADOR de forma flexible
         this.programadores = res.filter((u: any) => {
           const rol = (u.rol || u.persona?.rol || u.per_rol || '').toUpperCase();
           return rol === 'PROGRAMADOR';
         });
-        console.log("Programadores cargados para el select:", this.programadores);
       },
-      error: (err: any) => console.error("Error:", err)
+      error: (err: any) => console.error("Error al cargar expertos", err)
     });
   }
 
-  enviarSolicitud(): void {
-    if (!this.solicitud.programadorCedula || !this.solicitud.fecha || !this.solicitud.tema) {
-      alert("Por favor completa los campos");
-      return;
-    }
+  actualizarHorariosDisponibles(): void {
+    // Este método lo llama el (change) del HTML
+  }
 
-    const fechaHoraIso = `${this.solicitud.fecha}T${this.solicitud.hora || '08:00'}:00`;
+  enviarSolicitud(): void {
+    // IMPORTANTE: Java LocalDateTime requiere segundos (:00)
+    const fechaHoraIso = `${this.solicitud.fecha}T${this.solicitud.hora}:00`;
 
     const payload = {
       tema: this.solicitud.tema,
       fechaHora: fechaHoraIso,
       estado: 'PENDIENTE',
-      cliente: { cedula: this.authService.currentUser?.cedula },
-      programador: { cedula: this.solicitud.programadorCedula }
+      cliente: { 
+        cedula: this.authService.currentUser?.cedula || localStorage.getItem('cedula') 
+      },
+      programador: { 
+        cedula: this.solicitud.programadorCedula 
+      }
     };
 
     this.asesoriasService.crearAsesoria(payload).subscribe({
       next: () => {
-        alert("¡Asesoría agendada!");
+        alert("¡Asesoría agendada con éxito!");
         this.router.navigate(['/cliente/inicio']);
       },
-      error: (err: any) => console.error("Error al agendar", err)
+      error: (err: any) => {
+        console.error("Error 400:", err);
+        alert("Error al agendar. Revisa la consola para más detalles.");
+      }
     });
   }
 }

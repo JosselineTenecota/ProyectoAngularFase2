@@ -1,42 +1,76 @@
-<div class="agendar-container">
-  <h2>Agendar Asesoría</h2>
-  <p>Selecciona un experto y reserva tu espacio.</p>
+<div class="agendar-wrapper">
+  <div class="form-container">
+    <h1>Agendar Asesoría</h1>
+    <p class="subtitle">Selecciona un experto y reserva tu espacio.</p>
 
-  <form (ngSubmit)="enviarSolicitud()">
-    <div class="form-group">
-      <label>¿Con quién quieres hablar?</label>
-      <select [(ngModel)]="solicitud.programadorCedula" name="programador" required>
-        <option value="" disabled selected>Selecciona un programador</option>
-        <option *ngFor="let p of programadores" [value]="p.cedula || p.persona?.cedula">
-          {{ p.nombre || p.persona?.nombre }} {{ p.apellido || p.persona?.apellido }}
-        </option>
-      </select>
-    </div>
-
-    <div class="row">
+    <form #agendarForm="ngForm" (ngSubmit)="enviarSolicitud()">
+      
       <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" [(ngModel)]="solicitud.fecha" name="fecha" 
-               [min]="minDate" (change)="actualizarHorariosDisponibles()" required>
-      </div>
-
-      <div class="form-group">
-        <label>Hora Disponible</label>
-        <select [(ngModel)]="solicitud.hora" name="hora" required>
-          <option value="" disabled selected>Elige una hora</option>
-          <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
+        <label>¿Con quién quieres hablar?</label>
+        <select 
+          name="programador" 
+          class="input-dark" 
+          [(ngModel)]="solicitud.programadorCedula" 
+          #prog="ngModel"
+          required>
+          <option value="" disabled selected>Selecciona un programador</option>
+          <option *ngFor="let p of programadores" [value]="p.cedula || p.persona?.cedula">
+            {{ p.nombre || p.persona?.nombre }} {{ p.apellido || p.persona?.apellido }}
+          </option>
         </select>
+        <small class="error-text" *ngIf="prog.invalid && prog.touched">
+          Debes seleccionar un experto.
+        </small>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label>Motivo</label>
-      <textarea [(ngModel)]="solicitud.tema" name="tema" 
-                placeholder="¿En qué necesitas ayuda?" required></textarea>
-    </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Fecha</label>
+          <input 
+            type="date" 
+            name="fecha" 
+            class="input-dark" 
+            [(ngModel)]="solicitud.fecha" 
+            #fecha="ngModel"
+            required>
+        </div>
 
-    <button type="submit" [disabled]="!solicitud.programadorCedula" class="btn-submit">
-      Enviar Solicitud
-    </button>
-  </form>
+        <div class="form-group">
+          <label>Hora Disponible</label>
+          <select 
+            name="hora" 
+            class="input-dark" 
+            [(ngModel)]="solicitud.hora" 
+            #hora="ngModel"
+            required>
+            <option value="" disabled selected>00:00</option>
+            <option *ngFor="let h of horariosDisponibles" [value]="h">
+              {{ h }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Motivo</label>
+        <textarea 
+          name="tema" 
+          class="input-dark" 
+          rows="3" 
+          [(ngModel)]="solicitud.tema" 
+          #tema="ngModel"
+          placeholder="Escribe el motivo de la asesoría..." 
+          required>
+        </textarea>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-submit" 
+        [disabled]="agendarForm.invalid">
+        Enviar Solicitud
+      </button>
+
+    </form>
+  </div>
 </div>
