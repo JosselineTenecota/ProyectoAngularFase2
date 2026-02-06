@@ -1,25 +1,23 @@
 <nav class="navbar">
   
-  <!-- HAMBURGUESA (Móvil) -->
   <div class="hamburger" (click)="toggleMenu()">
     <span></span>
     <span></span>
     <span></span>
   </div>
 
-  <!-- MENÚ MÓVIL -->
   <div class="menu-mobile" [class.open]="menuOpen">
     <a class="accion-movil" routerLink="/" (click)="menuOpen=false">Home</a>
 
-    <a class="accion-movil" *ngIf="auth.currentRole === 'programador'" routerLink="/programador" (click)="menuOpen=false">
+    <a class="accion-movil" *ngIf="auth.currentRole === 'PROGRAMADOR'" routerLink="/programador" (click)="menuOpen=false">
       Panel Programador
     </a>
 
-    <a class="accion-movil" *ngIf="auth.currentRole === 'admin'" routerLink="/admin" (click)="menuOpen=false">
+    <a class="accion-movil" *ngIf="auth.currentRole === 'ADMIN'" routerLink="/admin" (click)="menuOpen=false">
       Admin
     </a>
 
-    <a class="accion-movil" *ngIf="auth.currentRole === 'cliente' || auth.currentRole === 'usuario'" routerLink="/mis-asesorias" (click)="menuOpen=false">
+    <a class="accion-movil" *ngIf="auth.currentRole === 'CLIENTE'" routerLink="/mis-asesorias" (click)="menuOpen=false">
       Mis Asesorías
     </a>
 
@@ -28,34 +26,29 @@
     </button>
   </div>
 
-  <!-- LINKS IZQUIERDA (Escritorio) -->
   <div class="nav-links">
     <a routerLink="/">Home</a>
 
-    <a *ngIf="auth.currentRole === 'programador'" routerLink="/programador">
+    <a *ngIf="auth.currentRole === 'PROGRAMADOR'" routerLink="/programador">
       Panel Programador
     </a>
 
-    <a *ngIf="auth.currentRole === 'admin'" routerLink="/admin">
+    <a *ngIf="auth.currentRole === 'ADMIN'" routerLink="/admin">
       Admin
     </a>
 
-    <a *ngIf="auth.currentRole === 'cliente' || auth.currentRole === 'usuario'" routerLink="/mis-asesorias">
+    <a *ngIf="auth.currentRole === 'CLIENTE'" routerLink="/mis-asesorias">
       Mis Asesorías
     </a>
   </div>
 
-  <!-- DERECHA (Usuario + Logout) -->
   <div class="right-section">
     
-    <!-- Usamos el getter currentUser del servicio -->
     <div class="user-info" *ngIf="auth.currentUser as user">
+      <img [src]="user.persona?.fotoUrl || user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.persona?.nombre || user.displayName || 'U')" 
+           alt="User Profile">
       
-      <!-- FOTO: Java (foto) o Firebase (photoURL) o Default -->
-      <img [src]="user.foto || user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.nombre || user.displayName || 'U')" alt="User">
-      
-      <!-- NOMBRE: Java (nombre) o Firebase (displayName/email) -->
-      <span>{{ user.nombre || user.displayName || user.email }}</span>
+      <span>{{ user.persona?.nombre || user.displayName || user.correo || user.email }}</span>
     </div>
 
     <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
