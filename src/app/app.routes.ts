@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'portafolios',
-    loadComponent: () => import('./public/pages/programadores/programadores').then(m => m.Programadores),
+    loadComponent: () => import('./public/pages/programadores/programadores').then(m => m.ProgramadoresComponent),
   },
   {
     path: 'portafolio/:id',
@@ -24,7 +24,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [authGuard], 
-    data: { role: 'ADMIN' }, // El guard verificará que Java devolvió 'ADMIN'
+    data: { role: 'ADMIN' },
     loadComponent: () => import('./admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard),
   },
 
@@ -32,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'programador',
     canActivate: [authGuard],
-    data: { role: 'PROGRAMADOR' }, // El guard verificará que Java devolvió 'PROGRAMADOR'
+    data: { role: 'PROGRAMADOR' },
     children: [
       {
         path: '',

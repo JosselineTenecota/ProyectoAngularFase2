@@ -1,33 +1,32 @@
-<div class="programmers-container" *ngIf="programmers$ | async as programmers; else loading">
+<div class="programmers-container" *ngIf="programadores && programadores.length > 0; else loading">
     
-    <div class="card-client" *ngFor="let p of programmers">
+    <div class="card-client" *ngFor="let p of programadores">
 
-        <!-- Foto -->
         <div class="user-picture">
-            <img *ngIf="p.photoURL; else noPhoto" [src]="p.photoURL" alt="{{ p.displayName }}">
+            <img *ngIf="p.foto || p.persona?.foto; else noPhoto" 
+                 [src]="p.foto || p.persona?.foto" 
+                 alt="Foto">
         </div>
+        
         <ng-template #noPhoto>
             <div class="user-picture">
-                <img src="assets/default-user.png" alt="Default user">
+                <img src="assets/default-user.png" alt="Default">
             </div>
         </ng-template>
 
-        <!-- Nombre -->
         <p class="name-client">
-            {{ p.displayName }}
-            <span>{{ p.specialty || 'Programador' }}</span>
+            {{ p.nombre || p.persona?.nombre }} {{ p.apellido || p.persona?.apellido }}
+            <span>{{ p.especialidad || p.persona?.rol || 'Programador' }}</span>
         </p>
+        
         <hr class="divider" />
 
-        <!-- Botón Ver proyectos -->
-        <button class="btn-proyectos" [routerLink]="['/portafolio', p.uid, 'proyectos']">
+        <button class="btn-proyectos" [routerLink]="['/portafolio', p.cedula || p.persona?.cedula, 'proyectos']">
             Ver Proyectos
         </button>
-
     </div>
-
 </div>
 
 <ng-template #loading>
-    <div class="loader">Cargando programadores...</div>
+    <div class="loader">Cargando expertos...</div>
 </ng-template>

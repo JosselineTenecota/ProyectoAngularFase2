@@ -1,96 +1,42 @@
-<div class="agendar-wrapper wrapper">
-  <div class="form-container">
-    
-    <h1>Agendar Asesoría</h1>
-    <p class="subtitle">Selecciona un experto y reserva tu espacio.</p>
+<div class="agendar-container">
+  <h2>Agendar Asesoría</h2>
+  <p>Selecciona un experto y reserva tu espacio.</p>
 
-    <div class="form-grid">
-      
-      <!-- 1. EXPERTO -->
-      <div class="form-group">
-        <label>¿Con quién quieres hablar?</label>
-        
-        <select [(ngModel)]="solicitud.programadorId" 
-                name="progId" 
-                required 
-                #progRef="ngModel"
-                (change)="actualizarHorariosDisponibles()" 
-                class="input-dark">
-          
-          <option value="" disabled selected>Selecciona un programador</option>
-          
-          <!-- CORRECCIÓN AQUÍ: Usamos las variables de JAVA -->
-          <option *ngFor="let p of programadores" [value]="p.cedula">
-            {{ p.nombre }} - {{ p.especialidad }}
-          </option>
-
-        </select>
-
-        <span *ngIf="progRef.invalid && (progRef.dirty || progRef.touched)" class="error-text">
-          * Selecciona un experto
-        </span>
-      </div>
-
-      <!-- FILA: FECHA Y HORA -->
-      <div class="row">
-        
-        <!-- 2. FECHA -->
-        <div class="form-group">
-          <label>Fecha</label>
-          <input type="date" 
-                 [(ngModel)]="solicitud.fecha" 
-                 name="fecha" 
-                 required 
-                 #dateRef="ngModel"
-                 [min]="minDate" 
-                 class="input-dark">
-          <span *ngIf="dateRef.invalid && (dateRef.dirty || dateRef.touched)" class="error-text">
-            * Requerido
-          </span>
-        </div>
-        
-        <!-- 3. HORA -->
-        <div class="form-group">
-          <label>Hora Disponible</label>
-          <select [(ngModel)]="solicitud.hora" 
-                  name="hora" 
-                  required 
-                  #timeRef="ngModel"
-                  class="input-dark">
-            
-            <option value="" disabled selected *ngIf="!solicitud.programadorId">Primero elige experto</option>
-            <option value="" disabled selected *ngIf="solicitud.programadorId">Selecciona hora</option>
-            
-            <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
-          </select>
-          <span *ngIf="timeRef.invalid && (timeRef.dirty || timeRef.touched)" class="error-text">
-            * Requerido
-          </span>
-        </div>
-
-      </div>
-
-      <!-- 4. MOTIVO -->
-      <div class="form-group">
-        <label>Motivo</label>
-        <textarea [(ngModel)]="solicitud.tema" 
-                  name="tema" 
-                  required 
-                  #temaRef="ngModel"
-                  rows="4" 
-                  class="input-dark"></textarea>
-        <span *ngIf="temaRef.invalid && (temaRef.dirty || temaRef.touched)" class="error-text">
-          * Cuéntanos el motivo
-        </span>
-      </div>
-
-      <!-- BOTÓN VERDE -->
-      <button class="btn-submit" 
-              (click)="enviarSolicitud()"
-              [disabled]="!solicitud.programadorId || !solicitud.fecha || !solicitud.hora || !solicitud.tema">
-        Enviar Solicitud
-      </button>
-
+  <form (ngSubmit)="enviarSolicitud()">
+    <div class="form-group">
+      <label>¿Con quién quieres hablar?</label>
+      <select [(ngModel)]="solicitud.programadorCedula" name="programador" required>
+        <option value="" disabled selected>Selecciona un programador</option>
+        <option *ngFor="let p of programadores" [value]="p.cedula || p.persona?.cedula">
+          {{ p.nombre || p.persona?.nombre }} {{ p.apellido || p.persona?.apellido }}
+        </option>
+      </select>
     </div>
-  </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" [(ngModel)]="solicitud.fecha" name="fecha" 
+               [min]="minDate" (change)="actualizarHorariosDisponibles()" required>
+      </div>
+
+      <div class="form-group">
+        <label>Hora Disponible</label>
+        <select [(ngModel)]="solicitud.hora" name="hora" required>
+          <option value="" disabled selected>Elige una hora</option>
+          <option *ngFor="let h of horariosDisponibles" [value]="h">{{ h }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Motivo</label>
+      <textarea [(ngModel)]="solicitud.tema" name="tema" 
+                placeholder="¿En qué necesitas ayuda?" required></textarea>
+    </div>
+
+    <button type="submit" [disabled]="!solicitud.programadorCedula" class="btn-submit">
+      Enviar Solicitud
+    </button>
+  </form>
 </div>

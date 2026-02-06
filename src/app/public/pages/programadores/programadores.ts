@@ -1,44 +1,35 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { UsuariosService } from '../../../core/services/usuarios.service';
-import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-programadores',
   standalone: true,
-  imports: [CommonModule, HttpClientModule], // Asegúrate de que HttpClientModule esté aquí
-  template: `
-    <div style="color: white; padding: 20px;">
-      <h2>Lista de Programadores</h2>
-      <button (click)="cargarManual()">Forzar Carga desde Postgres</button>
-      
-      <div *ngFor="let p of lista">
-        <p>{{ p.nombre }} - {{ p.especialidad }}</p>
-      </div>
-      
-      <p *ngIf="lista.length === 0">No se encontraron datos en el servidor.</p>
-    </div>
-  `
+  imports: [CommonModule, RouterModule],
+  templateUrl: './programadores.html',
+  styleUrls: ['./programadores.scss']
 })
-export class Programadores implements OnInit {
+export class ProgramadoresComponent implements OnInit {
   private service = inject(UsuariosService);
-  lista: any[] = [];
+  
+  // Usamos esta variable simple en lugar de un Observable con $
+  public programadores: any[] = [];
 
-  ngOnInit() {
-    this.cargarManual();
+  ngOnInit(): void {
+    this.cargarProgramadores();
   }
 
-  cargarManual() {
-    console.log("Intentando conectar con Java...");
+  cargarProgramadores(): void {
     this.service.listarProgramadores().subscribe({
-      next: (res) => {
-        console.log("Respuesta de Postgres:", res);
-        this.lista = res;
+      next: (res: any[]) => {
+        // Filtramos para asegurar que solo se muestren programadores
+        this.programadores = res.filter((u: any) => {
+          const rol = (u.rol || u.persona?.rol || u.per_rol || '').toUpperCase();
+          return rol === 'PROGRAMADOR';
+        });
       },
-      error: (err) => {
-        console.error("Error de conexión:", err);
-        alert("El servidor Java no responde. Revisa WildFly.");
-      }
+      error: (err: any) => console.error("Error al cargar programadores:", err)
     });
   }
 }
